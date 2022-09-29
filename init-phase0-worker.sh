@@ -3,7 +3,7 @@ echo -n "Enter password:"
 read PERMISSION_PASSWORD
 
 echo "make directories: for postgres"
-mkdir -p data/postgres deployment
+mkdir -p data/postgres
 
 echo "port configuring"
 echo "$PERMISSION_PASSWORD" | sudo -S ufw allow 2377
@@ -11,10 +11,11 @@ echo "$PERMISSION_PASSWORD" | sudo -S ufw allow 4789
 echo "$PERMISSION_PASSWORD" | sudo -S ufw allow 7946
 echo "$PERMISSION_PASSWORD" | sudo -S ufw reload
 
-source .env
+echo -n "Enter which chain you want to sync:"
+read CHAIN_NAME
 
-echo "change hostname to indexer-${CHAIN_1_NAME}"
-echo "$PERMISSION_PASSWORD" | sudo -S hostname indexer-${CHAIN_1_NAME}
+echo "change hostname to indexer-${CHAIN_NAME}"
+echo "$PERMISSION_PASSWORD" | sudo -S hostname indexer-${CHAIN_NAME}
 
 echo "restart docker"
 echo "$PERMISSION_PASSWORD" | sudo -S service docker restart
@@ -29,11 +30,3 @@ docker swarm join --token $DOCKER_SWARM_TOKEN $DOCKER_SWARM_MANAGER_IP
 
 echo "Initialization completed"
 
-echo "deploy ${CHAIN_1_NAME} indexer"
-set -o allexport; source .env; set +o allexport; envsubst < graphnode-config/config.tmpl > graphnode-config/config-${CHAIN_1_NAME}.toml
-(echo -e "version: '3.8'"; docker compose -f graph.yml --env-file .env config) > deployment/indexer-${CHAIN_1_NAME}.yml
-
-sed -i -e '2d' deployment/indexer-${CHAIN_1_NAME}.yml
-docker stack deploy -c deployment/indexer-${CHAIN_1_NAME}.yml indexer-${CHAIN_1_NAME}
-
-echo "Finished deployment"
