@@ -3,7 +3,7 @@ echo -n "Enter password:"
 read PERMISSION_PASSWORD
 
 echo "make directories: for postgres"
-mkdir -p data/postgres
+mkdir -p data/postgres deployment
 
 echo "port configuring"
 echo "$PERMISSION_PASSWORD" | sudo -S ufw allow 2377
@@ -14,7 +14,7 @@ echo "$PERMISSION_PASSWORD" | sudo -S ufw reload
 source .env
 
 echo "change hostname to indexer-${CHAIN_1_NAME}"
-hostname indexer-${CHAIN_1_NAME}
+echo "$PERMISSION_PASSWORD" | sudo -S hostname indexer-${CHAIN_1_NAME}
 
 echo "restart docker"
 echo "$PERMISSION_PASSWORD" | sudo -S service docker restart

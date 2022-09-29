@@ -70,8 +70,9 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
-    volumes:
-      - ./graphnode-config:/var/config:ro
+    configs:
+      - source: config-${CHAIN_0_NAME}.toml
+        target: /var/config/config-${CHAIN_0_NAME}
     networks:
       - default
       - monitor
@@ -171,4 +172,7 @@ networks:
     name: indexer_${CHAIN_0_NAME}_default
   monitor:
   traefik-public:
+    external: true
+configs:
+  config-${CHAIN_0_NAME}:
     external: true
