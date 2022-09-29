@@ -1,0 +1,1146 @@
+{
+	"annotations": {
+		"list": [
+			{
+				"builtIn": 1,
+				"datasource": "-- Grafana --",
+				"enable": true,
+				"hide": true,
+				"iconColor": "rgba(0, 211, 255, 1)",
+				"name": "Annotations & Alerts",
+				"type": "dashboard"
+			}
+		]
+	},
+	"editable": true,
+	"gnetId": null,
+	"graphTooltip": 0,
+	"id": 15,
+	"links": [],
+	"panels": [
+		{
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": "prometheus",
+			"fieldConfig": {
+				"defaults": {
+					"color": {},
+					"custom": {},
+					"thresholds": {
+						"mode": "absolute",
+						"steps": []
+					},
+					"unit": "none"
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 1,
+			"gridPos": {
+				"h": 7,
+				"w": 24,
+				"x": 0,
+				"y": 0
+			},
+			"hiddenSeries": false,
+			"id": 2,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": true,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": true
+			},
+			"percentage": false,
+			"pluginVersion": "7.4.3",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": false,
+			"steppedLine": false,
+			"targets": [
+				{
+					"exemplar": false,
+					"expr": "up",
+					"instant": false,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"thresholds": [],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "Service Status",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"transformations": [
+				{
+					"id": "labelsToFields",
+					"options": {
+						"valueLabel": "instance"
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {
+							"node-exporter:9100": true
+						},
+						"indexByName": {},
+						"renameByName": {
+							"Time": "",
+							"graph-index-node-1:8040": "Index-node-1",
+							"graph-index-node-2:8040": "Index-node-2",
+							"graph-query-node-1:8040": "Query-node-1",
+							"indexer-agent:7300": "Indexer-Agent",
+							"indexer-service:7300": "Indexer-Service",
+							"job": ""
+						}
+					}
+				}
+			],
+			"transparent": true,
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"$$hashKey": "object:1286",
+					"decimals": 0,
+					"format": "none",
+					"label": null,
+					"logBase": 1,
+					"max": "1",
+					"min": "0",
+					"show": true
+				},
+				{
+					"$$hashKey": "object:1287",
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": false
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		},
+		{
+			"alert": {
+				"alertRuleTags": {},
+				"conditions": [
+					{
+						"evaluator": {
+							"params": [0.5],
+							"type": "lt"
+						},
+						"operator": {
+							"type": "and"
+						},
+						"query": {
+							"params": ["A", "5m", "now"]
+						},
+						"reducer": {
+							"params": [],
+							"type": "min"
+						},
+						"type": "query"
+					}
+				],
+				"executionErrorState": "alerting",
+				"for": "5m",
+				"frequency": "1m",
+				"handler": 1,
+				"message": "Index node 1 is stopped.\nCheck and Fix it.",
+				"name": "Index Node 1 Status alert",
+				"noDataState": "alerting",
+				"notifications": []
+			},
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": "prometheus",
+			"fieldConfig": {
+				"defaults": {
+					"custom": {}
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 0,
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 0,
+				"y": 7
+			},
+			"hiddenSeries": false,
+			"id": 8,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": false,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": false
+			},
+			"percentage": false,
+			"pluginVersion": "7.4.3",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": false,
+			"steppedLine": false,
+			"targets": [
+				{
+					"expr": "up{instance=\"graph-index-node-1:8040\"}",
+					"instant": false,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"thresholds": [
+				{
+					"colorMode": "critical",
+					"fill": false,
+					"line": false,
+					"op": "lt",
+					"value": 0.5,
+					"visible": true
+				}
+			],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "Index Node 1 Status",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"$$hashKey": "object:1638",
+					"decimals": 0,
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": "1",
+					"min": "0",
+					"show": true
+				},
+				{
+					"$$hashKey": "object:1639",
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		},
+		{
+			"alert": {
+				"alertRuleTags": {},
+				"conditions": [
+					{
+						"evaluator": {
+							"params": [0.5],
+							"type": "lt"
+						},
+						"operator": {
+							"type": "and"
+						},
+						"query": {
+							"params": ["A", "5m", "now"]
+						},
+						"reducer": {
+							"params": [],
+							"type": "min"
+						},
+						"type": "query"
+					}
+				],
+				"executionErrorState": "alerting",
+				"for": "5m",
+				"frequency": "1m",
+				"handler": 1,
+				"message": "Index node 2 is stopped.\nCheck and Fix it.",
+				"name": "Index Node 2 Status alert",
+				"noDataState": "alerting",
+				"notifications": []
+			},
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": "prometheus",
+			"fieldConfig": {
+				"defaults": {
+					"custom": {}
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 0,
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 12,
+				"y": 7
+			},
+			"hiddenSeries": false,
+			"id": 9,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": false,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": false
+			},
+			"percentage": false,
+			"pluginVersion": "7.4.3",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": false,
+			"steppedLine": false,
+			"targets": [
+				{
+					"expr": "up{instance=\"graph-index-node-2:8040\"}",
+					"instant": false,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"thresholds": [
+				{
+					"colorMode": "critical",
+					"fill": false,
+					"line": false,
+					"op": "lt",
+					"value": 0.5,
+					"visible": true
+				}
+			],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "Index Node 2 Status",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"$$hashKey": "object:1638",
+					"decimals": 0,
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": "1",
+					"min": "0",
+					"show": true
+				},
+				{
+					"$$hashKey": "object:1639",
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		},
+		{
+			"alert": {
+				"alertRuleTags": {},
+				"conditions": [
+					{
+						"evaluator": {
+							"params": [0.5],
+							"type": "lt"
+						},
+						"operator": {
+							"type": "and"
+						},
+						"query": {
+							"params": ["A", "5m", "now"]
+						},
+						"reducer": {
+							"params": [],
+							"type": "min"
+						},
+						"type": "query"
+					}
+				],
+				"executionErrorState": "alerting",
+				"for": "5m",
+				"frequency": "1m",
+				"handler": 1,
+				"message": "Query node 1 is stopped.\nCheck and Fix it.",
+				"name": "Query Node 1 Status alert",
+				"noDataState": "alerting",
+				"notifications": []
+			},
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": "prometheus",
+			"fieldConfig": {
+				"defaults": {
+					"custom": {}
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 0,
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 0,
+				"y": 15
+			},
+			"hiddenSeries": false,
+			"id": 10,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": false,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": false
+			},
+			"percentage": false,
+			"pluginVersion": "7.4.3",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": false,
+			"steppedLine": false,
+			"targets": [
+				{
+					"expr": "up{instance=\"graph-query-node-1:8040\"}",
+					"instant": false,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"thresholds": [
+				{
+					"colorMode": "critical",
+					"fill": false,
+					"line": false,
+					"op": "lt",
+					"value": 0.5,
+					"visible": true
+				}
+			],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "Query Node 1 Status",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"$$hashKey": "object:1638",
+					"decimals": 0,
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": "1",
+					"min": "0",
+					"show": true
+				},
+				{
+					"$$hashKey": "object:1639",
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		},
+		{
+			"alert": {
+				"alertRuleTags": {},
+				"conditions": [
+					{
+						"evaluator": {
+							"params": [0.5],
+							"type": "lt"
+						},
+						"operator": {
+							"type": "and"
+						},
+						"query": {
+							"params": ["A", "5m", "now"]
+						},
+						"reducer": {
+							"params": [],
+							"type": "min"
+						},
+						"type": "query"
+					}
+				],
+				"executionErrorState": "alerting",
+				"for": "5m",
+				"frequency": "1m",
+				"handler": 1,
+				"message": "Indexer Agent is stopped.\nCheck and Fix it.",
+				"name": "Indexer Agent Status alert",
+				"noDataState": "alerting",
+				"notifications": []
+			},
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": "prometheus",
+			"description": "",
+			"fieldConfig": {
+				"defaults": {
+					"custom": {}
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 0,
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 12,
+				"y": 15
+			},
+			"hiddenSeries": false,
+			"id": 11,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": false,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": false
+			},
+			"percentage": false,
+			"pluginVersion": "7.4.3",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": false,
+			"steppedLine": false,
+			"targets": [
+				{
+					"expr": "up{instance=\"indexer-agent:7300\"}",
+					"instant": false,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"thresholds": [
+				{
+					"colorMode": "critical",
+					"fill": false,
+					"line": false,
+					"op": "lt",
+					"value": 0.5,
+					"visible": true
+				}
+			],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "Indexer Agent Status",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"$$hashKey": "object:1638",
+					"decimals": 0,
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": "1",
+					"min": "0",
+					"show": true
+				},
+				{
+					"$$hashKey": "object:1639",
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		},
+		{
+			"alert": {
+				"alertRuleTags": {},
+				"conditions": [
+					{
+						"evaluator": {
+							"params": [0.5],
+							"type": "lt"
+						},
+						"operator": {
+							"type": "and"
+						},
+						"query": {
+							"params": ["A", "5m", "now"]
+						},
+						"reducer": {
+							"params": [],
+							"type": "min"
+						},
+						"type": "query"
+					}
+				],
+				"executionErrorState": "alerting",
+				"for": "5m",
+				"frequency": "1m",
+				"handler": 1,
+				"message": "Indexer Service is stopped.\nCheck and Fix it.",
+				"name": "Indexer Service Status alert",
+				"noDataState": "no_data",
+				"notifications": []
+			},
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": "prometheus",
+			"fieldConfig": {
+				"defaults": {
+					"custom": {}
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 0,
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 0,
+				"y": 23
+			},
+			"hiddenSeries": false,
+			"id": 12,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": false,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": false
+			},
+			"percentage": false,
+			"pluginVersion": "7.4.3",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": false,
+			"steppedLine": false,
+			"targets": [
+				{
+					"expr": "up{instance=\"indexer-service:7300\"}",
+					"instant": false,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"thresholds": [
+				{
+					"colorMode": "critical",
+					"fill": false,
+					"line": false,
+					"op": "lt",
+					"value": 0.5,
+					"visible": true
+				}
+			],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "Indexer Service Status",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"$$hashKey": "object:1638",
+					"decimals": 0,
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": "1",
+					"min": "0",
+					"show": true
+				},
+				{
+					"$$hashKey": "object:1639",
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		},
+		{
+			"alert": {
+				"alertRuleTags": {},
+				"conditions": [
+					{
+						"evaluator": {
+							"params": [10],
+							"type": "lt"
+						},
+						"operator": {
+							"type": "and"
+						},
+						"query": {
+							"params": ["A", "30m", "now"]
+						},
+						"reducer": {
+							"params": [],
+							"type": "diff"
+						},
+						"type": "query"
+					}
+				],
+				"executionErrorState": "alerting",
+				"for": "5m",
+				"frequency": "1m",
+				"handler": 1,
+				"message": "Your block Ingestor seems not to work. Check and Fix it.",
+				"name": "Ethereum Block Sync status alert",
+				"noDataState": "no_data",
+				"notifications": []
+			},
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": "prometheus",
+			"fieldConfig": {
+				"defaults": {
+					"custom": {}
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 0,
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 12,
+				"y": 23
+			},
+			"hiddenSeries": false,
+			"id": 4,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": true,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": true
+			},
+			"percentage": false,
+			"pluginVersion": "7.4.3",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": false,
+			"steppedLine": false,
+			"targets": [
+				{
+					"expr": "ethereum_chain_head_number",
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"thresholds": [
+				{
+					"colorMode": "critical",
+					"fill": true,
+					"line": true,
+					"op": "lt",
+					"value": 10,
+					"visible": true
+				}
+			],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "Ethereum Block Sync status",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"$$hashKey": "object:440",
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				},
+				{
+					"$$hashKey": "object:441",
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		},
+		{
+			"alert": {
+				"alertRuleTags": {},
+				"conditions": [
+					{
+						"evaluator": {
+							"params": [5],
+							"type": "gt"
+						},
+						"operator": {
+							"type": "and"
+						},
+						"query": {
+							"params": ["A", "1h", "now"]
+						},
+						"reducer": {
+							"params": [],
+							"type": "avg"
+						},
+						"type": "query"
+					}
+				],
+				"executionErrorState": "alerting",
+				"for": "5m",
+				"frequency": "1m",
+				"handler": 1,
+				"message": "Your graph node seems to stop syncing.\nCheck why.",
+				"name": "Subgraph Indexing Status alert",
+				"noDataState": "alerting",
+				"notifications": []
+			},
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": "prometheus",
+			"description": "",
+			"fieldConfig": {
+				"defaults": {
+					"custom": {}
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 0,
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 12,
+				"y": 31
+			},
+			"hiddenSeries": false,
+			"id": 6,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": true,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": true
+			},
+			"percentage": false,
+			"pluginVersion": "7.4.3",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": false,
+			"steppedLine": false,
+			"targets": [
+				{
+					"expr": "deployment_blocks_behind",
+					"format": "time_series",
+					"instant": false,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"thresholds": [
+				{
+					"colorMode": "critical",
+					"fill": true,
+					"line": true,
+					"op": "gt",
+					"value": 5,
+					"visible": true
+				}
+			],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "Subgraph Indexing Status",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"transparent": true,
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"$$hashKey": "object:520",
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				},
+				{
+					"$$hashKey": "object:521",
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		}
+	],
+	"refresh": false,
+	"schemaVersion": 27,
+	"style": "dark",
+	"tags": [],
+	"templating": {
+		"list": []
+	},
+	"time": {
+		"from": "now-24h",
+		"to": "now"
+	},
+	"timepicker": {},
+	"timezone": "",
+	"title": "Service Status Board",
+	"uid": "VTm4ePPMz",
+	"version": 12
+}

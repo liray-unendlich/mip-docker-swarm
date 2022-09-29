@@ -1,0 +1,7 @@
+# ignore .env file without example.env
+*.env
+!example.env
+!phase0.example.env
+
+# ignore config.toml without config.tmpl
+*.toml
