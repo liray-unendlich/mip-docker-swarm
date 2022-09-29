@@ -19,7 +19,7 @@ services:
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
       TZ: Asia/Tokyo
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - ../data/postgres:/var/lib/postgresql/data
     # Swarm
     deploy:
       replicas: 1
@@ -72,7 +72,7 @@ services:
         max-file: "10"
     configs:
       - source: config-${CHAIN_0_NAME}.toml
-        target: /var/config/config-${CHAIN_0_NAME}
+        target: /var/config/config-${CHAIN_0_NAME}.toml
     networks:
       - default
       - monitor
@@ -127,8 +127,9 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
-    volumes:
-      - ./graphnode-config:/var/config:ro
+    configs:
+      - source: config-${CHAIN_0_NAME}.toml
+        target: /var/config/config-${CHAIN_0_NAME}.toml
     # Swarm
     networks:
       - default
@@ -147,8 +148,6 @@ services:
   node-exporter:
     image: prom/node-exporter
     restart: always
-    ports:
-      - 9100
     # Swarm
     deploy:
       replicas: 1
@@ -171,8 +170,9 @@ networks:
   default:
     name: indexer_${CHAIN_0_NAME}_default
   monitor:
+    external: true
   traefik-public:
     external: true
 configs:
-  config-${CHAIN_0_NAME}:
+  config-${CHAIN_0_NAME}.toml:
     external: true
