@@ -12,8 +12,6 @@ services:
       - "--log.level=warn"
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
-    # ports:
-    #   - 9090:9090
     volumes:
       - ./prometheus:/etc/prometheus:ro
       - ./data/prometheus:/prometheus
@@ -46,14 +44,13 @@ services:
         - traefik.http.routers.monitor-prometheus-https.tls=true
         - traefik.http.routers.monitor-prometheus-https.tls.certresolver=le
         - traefik.http.services.monitor-prometheus.loadbalancer.server.port=9090
-        - traefik.http.middlewares.monitor-prometheus-auth.basicauth.users=${PROMETHEUS_USER}:${PROMETHEUS_HASHED_PASSWORD?Variable not set}
+        - traefik.http.routers.monitor-prometheus-https.middlewares=prometheus-auth
+        - traefik.http.middlewares.prometheus-auth.basicauth.users=${PROMETHEUS_USER}:${PROMETHEUS_HASHED_PASSWORD:?Variable not set}
 
   grafana:
     image: grafana/grafana
     user: $UID:$GID
     restart: always
-    #ports:
-    #  - 3000:3000
     environment:
       postgres_host: "postgres:5432"
       postgres_db: "${DB_NAME}"
