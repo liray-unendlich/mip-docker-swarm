@@ -40,8 +40,8 @@ sed -i -e "$ a PROMETHEUS_HASHED_PASSWORD=${PROMETHEUS_HASHED_PASSWORD}" .env
 (PROMETHEUS_HASHED_PASSWORD=${PROMETHEUS_HASHED_PASSWORD}; echo -e "version: '3.8'"; docker compose -f swarmpit.yml --env-file .env config) > deployment/swarmpit.yml
 sed -i -e '2d' deployment/traefik.yml
 sed -i -e '2d' deployment/swarmpit.yml
-sed -i -e "$d" .env
-sed -i -e "$d" .env
+sed -i -e "$ d" .env
+sed -i -e "$ d" .env
 
 echo "deploy traefik/swarmpit"
 docker stack deploy -c deployment/traefik.yml traefik
