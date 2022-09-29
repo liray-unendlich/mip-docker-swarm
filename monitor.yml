@@ -6,7 +6,7 @@ services:
 
   prometheus:
     image: prom/prometheus
-    user: $UID:$GID
+    user: $USER_ID:$GROUP_ID
     restart: always
     command:
       - "--log.level=warn"
@@ -49,7 +49,7 @@ services:
 
   grafana:
     image: grafana/grafana
-    user: $UID:$GID
+    user: $USER_ID:$GROUP_ID
     restart: always
     environment:
       postgres_host: "postgres:5432"
