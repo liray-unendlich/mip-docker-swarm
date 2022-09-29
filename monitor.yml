@@ -92,7 +92,6 @@ networks:
   default:
     name: monitor_default
   monitor:
-    driver: overlay
-    attachable: true
+    external: true
   traefik-public:
     external: true
