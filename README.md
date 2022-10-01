@@ -78,6 +78,7 @@ bash init-phase0-worker.sh
 ここまでで、最低二つのサーバーが同じクラスター上に統合されました。実際に、統合されていることを確認するため、Web UI(Swarmpit)を確認しましょう。
 
 env(##5)で設定した"swarmpit.sld.tld"に接続してみましょう。すると、最初にアカウント設定を要求された後、ログインできるようになるはずです。ここでは、複数のサーバーにまたがって同じクラスターのサーバーの処理状況やプロセス状況を確認することが出来ます（下に例画像を張り付けています）。後で初期設定をする、インデックスサーバーの設定のログや、様々な設定をWebUIから変更できます。
+![image](https://user-images.githubusercontent.com/15893314/193424568-f43cead3-bdb2-44ff-bb1c-85151d7a7c2e.png)
 
 次に、実際にphase0を完了するため、インデックスサーバーのインストールを行います。
 
@@ -91,6 +92,7 @@ bash add-phase0-worker.sh
 - インデックスするチェーン名（6で設定したサーバーと同じ。例えばgnosis）
 - チェーンのRPC（アーカイブノードが必要）のURL
 を入力する必要があります。このスクリプトが完了すると、6で確認したswarmpitで、インデックスサービスの状態を見ることが出来るはずです。
+![image](https://user-images.githubusercontent.com/15893314/193424539-076714c2-8dfb-4078-9cc7-2d6d60f4aa78.png)
 
 ## 8. 使い方に慣れる
 今回、以下のdocker stackを生成・運用しています。
@@ -139,3 +141,4 @@ curl --location --request POST 'http://localhost:8020' --header 'Content-Type: a
 同期が進んでおり、
 query.sld.tld/subgraphs/name/1Hive-GardenGC/graphql
 への接続が出来れば（GraphQLのページが表示されればOK）問題なく設定が出来ています。
+![image](https://user-images.githubusercontent.com/15893314/193424512-aae48349-a3e3-4b1b-9e0f-cbd044be63de.png)
