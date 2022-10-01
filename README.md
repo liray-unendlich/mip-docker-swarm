@@ -27,7 +27,7 @@ MIPテストネットへの対応として、チェーンごとの別サーバ�
 | swarmpit | swarmpit.sld.tld | サーバー（マネージャー）のIP |
 | prometheus | prometheus.sld.tld | サーバー（マネージャー）のIP |
 | grafana | grafana.sld.tld | サーバー（マネージャー）のIP |
-| query | query.sld.tld | サーバー（gnosis）のIP |
+| query | query.sld.tld | サーバー（マネージャー）のIP |
 
 ## 4. dockerをインストールする
 dockerは、次の手続きでインストールしましょう。ここから、*サーバーごとに実施することを明記したコマンドを除き、使用するサーバー全て*で同じことを行ってください。
@@ -133,3 +133,9 @@ curl --location --request POST 'http://localhost:8020' --header 'Content-Type: a
 | Connext-NXTPv1-Gnosis | QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe |
 | 1Hive-GardenGC | QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX |
 | Giveth-Economy-Gnosis | QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq |
+
+同期が完了するタイミングは、Grafanaのdashboardである、"Indexing Status Overview" で確認してください。
+
+同期が進んでおり、
+query.sld.tld/subgraphs/name/1Hive-GardenGC/graphql
+への接続が出来れば（GraphQLのページが表示されればOK）問題なく設定が出来ています。
