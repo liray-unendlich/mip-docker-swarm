@@ -48,7 +48,7 @@ docker stack deploy -c deployment/monitor.yml monitor
 
 # show swarm token
 echo "Copy below token for initializing new worker."
-echo "You can show this token again with: `docker swarm join-token worker`"
+echo "You can show this token again with: docker swarm join-token worker"
 
 docker swarm join-token worker
 
