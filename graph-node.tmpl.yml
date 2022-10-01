@@ -69,7 +69,7 @@ services:
         max-size: "200k"
         max-file: "10"
     configs:
-      - source: config-${CHAIN_0_NAME}.toml
+      - source: ${CHAIN_CONF_NAME}
         target: /var/config/config-${CHAIN_0_NAME}.toml
     networks:
       - default
