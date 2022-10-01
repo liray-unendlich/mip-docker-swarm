@@ -9,7 +9,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - net
+      - default
       - traefik-public
     deploy:
       resources:
@@ -40,7 +40,7 @@ services:
     volumes:
       - ./data/swarmpit/db-data:/opt/couchdb/data
     networks:
-      - net
+      - default
     deploy:
       resources:
         limits:
@@ -58,7 +58,7 @@ services:
     volumes:
       - ./data/swarmpit/influx-data:/opt/couchdb/data
     networks:
-      - net
+      - default
     deploy:
       resources:
         reservations:
@@ -78,7 +78,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - net
+      - default
     deploy:
       mode: global
       resources:
@@ -93,9 +93,8 @@ services:
           - node.role == manager
 
 networks:
-  net:
-    driver: overlay
-    attachable: true
+  default:
+    name: swarmpit_default
   traefik-public:
     external: true
 

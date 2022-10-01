@@ -21,7 +21,7 @@ docker swarm init
 
 echo "create overlay network: traefik/monitor"
 docker network create --driver=overlay traefik-public
-docker network create --drive=overlay monitor
+docker network create --driver=overlay monitor
 
 echo "generate docker swarm configuration files(deployment/*.yml)"
 NODE_ID=$(docker info -f '{{.Swarm.NodeID}}')
@@ -33,19 +33,17 @@ TRAEFIK_HASHED_PASSWORD=$(openssl passwd -apr1 $TRAEFIK_PASSWORD)
 PROMETHEUS_HASHED_PASSWORD=$(openssl passwd -apr1 $PROMETHEUS_PASSWORD)
 TRAEFIK_HASHED_PASSWORD=${TRAEFIK_HASHED_PASSWORD//\$/\$\$}
 PROMETHEUS_HASHED_PASSWORD=${PROMETHEUS_HASHED_PASSWORD//\$/\$\$}
-sed -i -e "$ a PROMETHEUS_HASHED_PASSWORD=${PROMETHEUS_HASHED_PASSWORD}" .env
 
 set -o allexport; source .env; TRAEFIK_HASHED_PASSWORD=${TRAEFIK_HASHED_PASSWORD}; set +o allexport; envsubst < traefik.yml > deployment/traefik.yml
 (echo -e "version: '3.8'"; docker compose -f swarmpit.yml --env-file .env config) > deployment/swarmpit.yml
+sed -i -e '2d' deployment/swarmpit.yml
 
 echo "deploy traefik/swarmpit"
 docker stack deploy -c deployment/traefik.yml traefik
 docker stack deploy -c deployment/swarmpit.yml swarmpit
 
 echo "deploy monitor service"
-(PROMETHEUS_HASHED_PASSWORD=${PROMETHEUS_HASHED_PASSWORD}; echo -e "version: '3.8'"; docker compose -f monitor.yml --env-file .env config) > deployment/monitor.yml
-sed -i -e "$ d" .env
-sed -i -e '2d' deployment/monitor.yml
+set -o allexport; source .env; PROMETHEUS_HASHED_PASSWORD=${PROMETHEUS_HASHED_PASSWORD}; set +o allexport; envsubst < monitor.yml > deployment/monitor.yml
 docker stack deploy -c deployment/monitor.yml monitor
 
 # show swarm token
