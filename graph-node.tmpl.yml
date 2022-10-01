@@ -171,5 +171,5 @@ networks:
   traefik-public:
     external: true
 configs:
-  config-${CHAIN_0_NAME}.toml:
+  ${CHAIN_CONF_NAME}:
     external: true
