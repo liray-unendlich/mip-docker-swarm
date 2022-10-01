@@ -12,13 +12,15 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
     volumes:
-      - ./prometheus:/etc/prometheus:ro
-      - ./data/prometheus:/prometheus
+      - ../data/prometheus:/prometheus
     # Swarm
     networks:
       - default
       - monitor
       - traefik-public
+    configs:
+      - source: ${PROMETHEUS_CONF_NAME}
+        target: /etc/prometheus/prometheus.yml
     deploy:
       mode: replicated
       replicas: 1
@@ -54,10 +56,9 @@ services:
       postgres_db: "${DB_NAME}"
       postgres_user: "${DB_USER}"
       postgres_pass: "${DB_PASSWORD}"
-      GF_SERVER_ROOT_URL: "${GRAFANA_DOMAIN}"
     volumes:
-      - ./grafana:/etc/grafana/
-      - ./data/grafana:/var/lib/grafana
+      - ../grafana:/etc/grafana/
+      - ../data/grafana:/var/lib/grafana
     # Swarm
     networks:
       - default
