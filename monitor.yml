@@ -62,6 +62,7 @@ services:
     # Swarm
     networks:
       - default
+      - monitor
       - traefik-public
     deploy:
       mode: replicated
