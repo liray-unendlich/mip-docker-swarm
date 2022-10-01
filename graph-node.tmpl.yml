@@ -7,8 +7,7 @@ services:
   ############################################################################
   postgres:
     image: postgres:13.6
-    user: $UID:$GID
-    restart: always
+    user: $USER_ID:$GROUP_ID
     command:
       - "postgres"
       - "-cshared_preload_libraries=pg_stat_statements"
@@ -44,7 +43,6 @@ services:
 
   query-node:
     image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.27.0}
-    restart: unless-stopped
     environment:
       GRAPH_NODE_CONFIG: /var/config/config-${CHAIN_0_NAME}.toml
       postgres_host: "postgres"
@@ -147,7 +145,6 @@ services:
 
   node-exporter:
     image: prom/node-exporter
-    restart: always
     # Swarm
     deploy:
       replicas: 1
