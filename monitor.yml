@@ -7,7 +7,6 @@ services:
   prometheus:
     image: prom/prometheus
     user: $USER_ID:$GROUP_ID
-    restart: always
     command:
       - "--log.level=warn"
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -45,12 +44,11 @@ services:
         - traefik.http.routers.monitor-prometheus-https.tls.certresolver=le
         - traefik.http.services.monitor-prometheus.loadbalancer.server.port=9090
         - traefik.http.routers.monitor-prometheus-https.middlewares=prometheus-auth
-        - traefik.http.middlewares.prometheus-auth.basicauth.users=${PROMETHEUS_USER}:${PROMETHEUS_HASHED_PASSWORD:?Variable not set}
+        - traefik.http.middlewares.prometheus-auth.basicauth.users=${PROMETHEUS_USER}:${PROMETHEUS_HASHED_PASSWORD}
 
   grafana:
     image: grafana/grafana
     user: $USER_ID:$GROUP_ID
-    restart: always
     environment:
       postgres_host: "postgres:5432"
       postgres_db: "${DB_NAME}"
