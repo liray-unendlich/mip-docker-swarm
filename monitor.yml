@@ -94,3 +94,6 @@ networks:
     external: true
   traefik-public:
     external: true
+configs:
+  ${PROMETHEUS_CONF_NAME}:
+    external: true
