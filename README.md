@@ -140,5 +140,5 @@ curl --location --request POST 'http://localhost:8020' --header 'Content-Type: a
 
 同期が進んでおり、
 query.sld.tld/subgraphs/name/1Hive-GardenGC/graphql
-への接続が出来れば（GraphQLのページが表示されればOK）問題なく設定が出来ています。
+への接続が出来れば（GraphQLのページが表示されればOK）問題なく設定が出来ています。ここまで完了したら、フォームでエンドポイントを提出しましょう！
 ![image](https://user-images.githubusercontent.com/15893314/193424512-aae48349-a3e3-4b1b-9e0f-cbd044be63de.png)
