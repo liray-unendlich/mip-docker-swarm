@@ -13,6 +13,7 @@ services:
       - "--storage.tsdb.path=/prometheus"
     volumes:
       - ../data/prometheus:/prometheus
+      - ../prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml
     # Swarm
     networks:
       - default
@@ -87,6 +88,42 @@ services:
         - traefik.http.routers.monitor-grafana-https.tls=true
         - traefik.http.routers.monitor-grafana-https.tls.certresolver=le
         - traefik.http.services.monitor-grafana.loadbalancer.server.port=3000
+
+  alertmanager:
+    image: prom/alertmanager
+    user: $USER_ID:$GROUP_ID
+    command:
+      - "--config.file=/etc/alertmanager/config.yml"
+      - "--storage.path=/alertmanager"
+    volumes:
+      - ../alertmanager:/etc/alertmanager
+    networks:
+      - default
+      - monitor
+      - traefik-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - "traefik.http.routers.monitor-alertmanager-http.rule=Host(`${ALERTMANAGER_DOMAIN}`)"
+        - traefik.http.routers.monitor-alertmanager-http.entrypoints=http
+        - traefik.http.routers.monitor-alertmanager-http.middlewares=https-redirect
+        - "traefik.http.routers.monitor-alertmanager-https.rule=Host(`${ALERTMANAGER_DOMAIN}`)"
+        - traefik.http.routers.monitor-alertmanager-https.entrypoints=https
+        - traefik.http.routers.monitor-alertmanager-https.tls=true
+        - traefik.http.routers.monitor-alertmanager-https.tls.certresolver=le
+        - traefik.http.services.monitor-alertmanager.loadbalancer.server.port=9093
 
 networks:
   default:
