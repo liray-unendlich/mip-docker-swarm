@@ -78,6 +78,8 @@ services:
       - --log
       # Enable the Dashboard and API
       - --api
+      # Enable Metrics
+      - --metrics.prometheus
     networks:
       # Use the public network created to be shared between Traefik and
       # any other service that needs to be publicly available with HTTPS
