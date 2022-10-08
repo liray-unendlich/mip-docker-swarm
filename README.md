@@ -143,3 +143,44 @@ curl --location --request POST 'http://localhost:8020' --header 'Content-Type: a
 query.sld.tld/subgraphs/name/1Hive-GardenGC/graphql
 への接続が出来れば（GraphQLのページが表示されればOK）問題なく設定が出来ています。ここまで完了したら、フォームでエンドポイントを提出しましょう！
 ![image](https://user-images.githubusercontent.com/15893314/193424512-aae48349-a3e3-4b1b-9e0f-cbd044be63de.png)
+
+## 10. もっとカスタムしたい人
+もっとカスタムしたい人向けに、簡単なメモを入れておきます。
+
+### 複数のRPC APIを使って接続したい
+swarmpit -> configs の中に、`config-gnosis-日付`というファイルが見つかるはずです。このファイルの中には、下のような情報が記載されています。このconfigファイルを直接サービスに読み込ませることで、ファイルを直接サーバーに受け渡しせず、設定が可能になっています。
+```
+[store]
+[store.primary]
+connection = "postgresql://DBのユーザー名:DBのパスワード@postgres:5432/DB名"
+pool_size = 10
+[chains]
+ingestor = "index_node_gnosis"
+[chains.gnosis]
+shard = "primary"
+provider = [
+             { label = "gnosis", url = "CHAINSTACKのURL", features = ["archive", "traces"] }
+           ]
+[deployment]
+[[deployment.rule]]
+indexers = [ "index_node_gnosis" ]
+[general]
+query = "query_node_gnosis"
+```
+
+ここで、[chains.gnosis]内にあるproviderを次のように書き換えると、RPC APIを追加できます。
+ただし、featuresは次のように選びましょう。
+| features | ノード種類 |
+| --- | --- |
+| [] | フルノード |
+| archive | アーカイブノード |
+| traces | トレースが有効なノード（アーカイブノード） |
+
+```
+provider = [
+             { label = "gnosis", url = "フルノードのURL", features = [] },
+             { label = "gnosis", url = "ANKRのURL", features = ["archive"] },
+             { label = "gnosis", url = "CHAINSTACKのURL", features = ["archive", "traces"] }
+           ]
+```
+以上、様々な設定をしてみてください。
