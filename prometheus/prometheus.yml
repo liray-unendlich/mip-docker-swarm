@@ -11,3 +11,8 @@ scrape_configs:
     static_configs:
       - targets:
           ["indexer-gnosis_index-node:8040", "indexer-gnosis_query-node:8040"]
+
+  - job_name: "traefik"
+    static_configs:
+      - targets:
+          - "traefik:8080"
