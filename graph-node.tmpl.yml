@@ -163,6 +163,31 @@ services:
       - default
       - monitor
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      # - /cgroup:/cgroup:ro
+    networks:
+      - default
+      - monitor
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == indexer-${CHAIN_0_NAME}
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
 networks:
   default:
     name: indexer_${CHAIN_0_NAME}_default

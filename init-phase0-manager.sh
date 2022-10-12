@@ -41,6 +41,8 @@ set -o allexport; source .env; TRAEFIK_HASHED_PASSWORD=${TRAEFIK_HASHED_PASSWORD
 (echo -e "version: '3.8'"; docker compose -f swarmpit.yml --env-file .env config) > deployment/swarmpit.yml
 sed -i -e '2d' deployment/swarmpit.yml
 
+set -o allexport; source .env; envsubst < alertmanager/config.tmpl.yml > alertmanager/config.yml;
+
 echo "deploy traefik/swarmpit"
 docker stack deploy -c deployment/traefik.yml traefik
 docker stack deploy -c deployment/swarmpit.yml swarmpit
