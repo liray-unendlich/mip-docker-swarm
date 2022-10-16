@@ -1,0 +1,153 @@
+version: "3.5"
+services:
+  ############################################################################
+  #                    POSTGRES - Database for index-agent                   #
+  ############################################################################
+  postgres-indexer:
+    image: postgres:13.6
+    user: $USER_ID:$GROUP_ID
+    command:
+      - "postgres"
+      - "-cshared_preload_libraries=pg_stat_statements"
+    environment:
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      TZ: Asia/Tokyo
+    volumes:
+      - ../data/postgres:/var/lib/postgresql/data
+    # Swarm
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == indexer-manager
+      labels:
+        - traefik.enable=false
+      resources:
+        reservations:
+          cpus: "0.1"
+          memory: 1024M
+    networks:
+      - default
+      - monitor
+
+  ############################################################################
+  #                         Indexer Agent/Service                            #
+  ############################################################################
+
+  indexer-agent:
+    image: ghcr.io/graphprotocol/indexer-agent:${INDEXER_VERSION:-v0.20.3}
+    environment:
+      INDEXER_AGENT_ETHEREUM: ${INDEXER_RPC}
+      INDEXER_AGENT_ETHEREUM_NETWORK: goerli
+      INDEXER_AGENT_INDEXER_ADDRESS: ${INDEXER_ADDRESS}
+      INDEXER_AGENT_MNEMONIC: ${INDEXER_MNEMONIC}
+      INDEXER_AGENT_GEO_COORDINATES: ${INDEXER_GEO}
+      INDEXER_AGENT_NETWORK_SUBGRAPH_DEPLOYMENT: ${INDEXER_NETWORK_SUBGRAPH:-QmPVz18RFwK6hE5rZFWERk23LgrTBz2FCkZzgPSrFxFWN4}
+      INDEXER_AGENT_NETWORK_SUBGRAPH_ENDPOINT: https://gateway.testnet.thegraph.com/network
+      INDEXER_AGENT_COLLECT_RECEIPTS_ENDPOINT: https://gateway.testnet.thegraph.com/collect-receipts
+      # CHECK THIS. we should choose this...
+      GRAPH_NODE_QUERY_ENDPOINT: ${INDEXER_QUERY_ENDPOINT:-http://indexer-gnosis_query-node:8000}
+      GRAPH_NODE_ADMIN_ENDPOINT: ${INDEXER_ADMIN_ENDPOINT:-http://indexer-gnosis_index-node:8020}
+      GRAPH_NODE_STATUS_ENDPOINT: ${INDEXER_NODE_STATUS_ENDPOINT:-http://index-node:8030/graphql}
+      PUBLIC_INDEXER_URL: ${INDEXER_DOMAIN}
+      INDEX_NODE_IDS: index_node_gnosis
+      INDEXER_AGENT_INDEXER_MANAGEMENT_PORT: 8000
+      POSTGRES_HOST: "postgres-indexer"
+      POSTGRES_DATABASE: "${DB_NAME}"
+      POSTGRES_USERNAME: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      TZ: Asia/Tokyo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    networks:
+      - default
+      - monitor
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == indexer-manager
+
+  indexer-service:
+    image: ghcr.io/graphprotocol/indexer-service:${INDEXER_VERSION:-v0.20.3}
+    environment:
+      INDEXER_SERVICE_ETHEREUM: ${INDEXER_RPC}
+      INDEXER_SERVICE_ETHEREUM_NETWORK: goerli
+      INDEXER_SERVICE_INDEXER_ADDRESS: ${INDEXER_ADDRESS}
+      INDEXER_SERVICE_MNEMONIC: ${INDEXER_MNEMONIC}
+      INDEXER_SERVICE_NETWORK_SUBGRAPH_DEPLOYMENT: ${INDEXER_NETWORK_SUBGRAPH:-QmPVz18RFwK6hE5rZFWERk23LgrTBz2FCkZzgPSrFxFWN4}
+      INDEXER_SERVICE_NETWORK_SUBGRAPH_ENDPOINT: https://gateway.testnet.thegraph.com/network
+      INDEXER_SERVICE_CLIENT_SIGNER_ADDRESS: "0xe1EC4339019eC9628438F8755f847e3023e4ff9c"
+      GRAPH_NODE_QUERY_ENDPOINT: ${INDEXER_QUERY_ENDPOINT:-http://indexer-gnosis_query-node:8000}
+      GRAPH_NODE_ADMIN_ENDPOINT: ${INDEXER_ADMIN_ENDPOINT:-http://indexer-gnosis_index-node:8020}
+      SERVER_PORT: 5432
+      TZ: Asia/Tokyo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    # Swarm
+    networks:
+      - default
+      - traefik-public
+      - monitor
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == indexer-manager
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - "traefik.http.routers.indexer-service-http.rule=Host(`${INDEXER_DOMAIN}`)"
+        - traefik.http.routers.indexer-service-http.entrypoints=http
+        - traefik.http.routers.indexer-service-http.middlewares=https-redirect
+        - "traefik.http.routers.indexer-service-https.rule=Host(`${INDEXER_DOMAIN}`)"
+        - traefik.http.routers.indexer-service-https.entrypoints=https
+        - traefik.http.routers.indexer-service-https.tls=true
+        - traefik.http.routers.indexer-service-https.tls.certresolver=le
+        - traefik.http.services.indexer-service.loadbalancer.server.port=7600
+
+  ############################################################################
+  #                      node-exporter - Export data                         #
+  ############################################################################
+
+  node-exporter:
+    image: prom/node-exporter
+    # Swarm
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == indexer-manager
+      resources:
+        reservations:
+          cpus: "0.1"
+          memory: 512M
+      labels:
+        - traefik.enable=false
+    networks:
+      - default
+      - monitor
+
+networks:
+  default:
+    name: indexer_default
+  monitor:
+    external: true
+  traefik-public:
+    external: true
