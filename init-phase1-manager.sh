@@ -44,6 +44,12 @@ if [ -z "$CONSOLE_DOMAIN" ]; then
   sed -i -e "$ a CONSOLE_DOMAIN=${CONSOLE_DOMAIN}" .env
 fi
 
+if [ -z "$CONSOLE_USER" ]; then
+  echo -n "Enter your console user:"
+  read CONSOLE_USER
+  sed -i -e "$ a CONSOLE_USER=${CONSOLE_USER}" .env
+fi
+
 if [ -z "$CONSOLE_PASSWORD" ]; then
   echo -n "Enter your console password:"
   read CONSOLE_PASSWORD
