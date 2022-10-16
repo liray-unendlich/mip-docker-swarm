@@ -1,7 +1,5 @@
 #!bin/bash
 
-mkdir -p data/postgres
-
 echo "pull latest code"
 /usr/bin/git pull
 
@@ -13,43 +11,43 @@ echo "You might need to enter several parameters for indexer-agent/service setup
 if [ -z "$INDEXER_RPC" ]; then
   echo -n "Enter goerli RPC API URL:"
   read INDEXER_RPC
-  sed -e "$ a INDEXER_RPC=${INDEXER_RPC}" .env
+  sed -i -e "$ a INDEXER_RPC=${INDEXER_RPC}" .env
 fi
 
 if [ -z "$INDEXER_ADDRESS" ]; then
   echo -n "Enter indexer address on goerli:"
   read INDEXER_ADDRESS
-  sed -e "$ a INDEXER_RPC=${INDEXER_RPC}" .env
+  sed -i -e "$ a INDEXER_RPC=${INDEXER_RPC}" .env
 fi
 
 if [ -z "$INDEXER_MNEMONIC" ]; then
   echo -n "Enter indexer mnemonic on goerli:"
   read INDEXER_MNEMONIC
-  sed -e "$ a INDEXER_MNEMONIC=${INDEXER_MNEMONIC}" .env
+  sed -i -e "$ a INDEXER_MNEMONIC=${INDEXER_MNEMONIC}" .env
 fi
 
 if [ -z "$INDEXER_GEO" ]; then
   echo -n "Enter your server location in LONGITUDE LATITUDE: like xx.xx yy.yy:"
   read INDEXER_GEO
-  sed -e "$ a INDEXER_GEO=${INDEXER_GEO}" .env
+  sed -i -e "$ a INDEXER_GEO=${INDEXER_GEO}" .env
 fi
 
 if [ -z "$INDEXER_DOMAIN" ]; then
   echo -n "Enter your indexer domain:"
   read INDEXER_DOMAIN
-  sed -e "$ a INDEXER_DOMAIN=${INDEXER_DOMAIN}" .env
+  sed -i -e "$ a INDEXER_DOMAIN=${INDEXER_DOMAIN}" .env
 fi
 
 if [ -z "$CONSOLE_DOMAIN" ]; then
   echo -n "Enter your console domain:"
   read CONSOLE_DOMAIN
-  sed -e "$ a CONSOLE_DOMAIN=${CONSOLE_DOMAIN}" .env
+  sed -i -e "$ a CONSOLE_DOMAIN=${CONSOLE_DOMAIN}" .env
 fi
 
 if [ -z "$CONSOLE_PASSWORD" ]; then
   echo -n "Enter your console password:"
   read CONSOLE_PASSWORD
-  sed -e "$ a CONSOLE_DOMAIN=${CONSOLE_PASSWORD}" .env
+  sed -i -e "$ a CONSOLE_DOMAIN=${CONSOLE_PASSWORD}" .env
 fi
 
 echo "build indexer-cli image. It might take 10mins."
