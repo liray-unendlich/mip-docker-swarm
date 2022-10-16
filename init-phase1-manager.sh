@@ -5,23 +5,34 @@ mkdir -p data/postgres
 echo "pull latest code"
 /usr/bin/git pull
 
-echo "Enter several parameters for indexer-agent/service setup"
-echo -n "Enter goerli RPC API URL:"
-read INDEXER_RPC
+echo "read .env"
+source .env
 
-echo -n "Enter indexer address on goerli:"
-read INDEXER_ADDRESS
+echo "You might need to enter several parameters for indexer-agent/service setup"
 
-echo -n "Enter indexer mnemonic on goerli:"
-read INDEXER_MNEMONIC
+if [ -z "$INDEXER_RPC" ]; then
+  echo -n "Enter goerli RPC API URL:"
+  read INDEXER_RPC
+fi
 
-echo -n "Enter your server location in LONGITUDE LATITUDE: like xx.xx yy.yy"
-read INDEXER_GEO
+if [ -z "$INDEXER_ADDRESS" ]; then
+  echo -n "Enter indexer address on goerli:"
+  read INDEXER_ADDRESS
+fi
+
+if [ -z "$INDEXER_MNEMONIC" ]; then
+  echo -n "Enter indexer mnemonic on goerli:"
+  read INDEXER_MNEMONIC
+fi
+
+if [ -z "$INDEXER_GEO" ]; then
+  echo -n "Enter your server location in LONGITUDE LATITUDE: like xx.xx yy.yy:"
+  read INDEXER_GEO
+fi
 
 echo "build indexer-cli image. It might take 10mins."
 docker build -t indexer-cli-console:0.1 ./indexer-console/.
 
-source .env
 CONSOLE_HASHED_PASSWORD=$(openssl passwd -apr1 $CONSOLE_PASSWORD)
 CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD//\$/\$\$}
 
