@@ -17,19 +17,19 @@ fi
 if [ -z "$INDEXER_ADDRESS" ]; then
   echo -n "Enter indexer address on goerli:"
   read INDEXER_ADDRESS
-  sed -i -e "$ a INDEXER_RPC=${INDEXER_RPC}" .env
+  sed -i -e "$ a INDEXER_ADDRESS=${INDEXER_ADDRESS}" .env
 fi
 
 if [ -z "$INDEXER_MNEMONIC" ]; then
   echo -n "Enter indexer mnemonic on goerli:"
   read INDEXER_MNEMONIC
-  sed -i -e "$ a INDEXER_MNEMONIC=${INDEXER_MNEMONIC}" .env
+  sed -i -e "$ a INDEXER_MNEMONIC=\"${INDEXER_MNEMONIC}\"" .env
 fi
 
 if [ -z "$INDEXER_GEO" ]; then
   echo -n "Enter your server location in LONGITUDE LATITUDE: like xx.xx yy.yy:"
   read INDEXER_GEO
-  sed -i -e "$ a INDEXER_GEO=${INDEXER_GEO}" .env
+  sed -i -e "$ a INDEXER_GEO=\"${INDEXER_GEO}\"" .env
 fi
 
 if [ -z "$INDEXER_DOMAIN" ]; then
@@ -47,7 +47,7 @@ fi
 if [ -z "$CONSOLE_PASSWORD" ]; then
   echo -n "Enter your console password:"
   read CONSOLE_PASSWORD
-  sed -i -e "$ a CONSOLE_DOMAIN=${CONSOLE_PASSWORD}" .env
+  sed -i -e "$ a CONSOLE_PASSWORD=${CONSOLE_PASSWORD}" .env
 fi
 
 echo "build indexer-cli image. It might take 10mins."
