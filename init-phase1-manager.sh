@@ -62,9 +62,9 @@ docker build -t indexer-cli-console:0.1 ./indexer-console/.
 CONSOLE_HASHED_PASSWORD=$(openssl passwd -apr1 $CONSOLE_PASSWORD)
 CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD//\$/\$\$}
 
-set -o allexport; source .env; CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD}; set +o allexport; envsubst < indexer-console.tmpl.yml > deployment/indexer-console.yml
+set -o allexport; source .env; CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD}; set +o allexport; envsubst < ./template/indexer-console.tmpl.yml > deployment/indexer-console.yml
 
-set -o allexport; source .env; set +o allexport; envsubst < indexer.tmpl.yml > deployment/indexer.yml
+set -o allexport; source .env; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml
 
 echo "deploy indexer and console"
 docker stack deploy -c deployment/indexer.yml indexer
