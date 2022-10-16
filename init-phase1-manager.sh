@@ -35,9 +35,21 @@ if [ -z "$INDEXER_GEO" ]; then
 fi
 
 if [ -z "$INDEXER_DOMAIN" ]; then
-  echo -n "Enter your server location in LONGITUDE LATITUDE: like xx.xx yy.yy:"
+  echo -n "Enter your indexer domain:"
   read INDEXER_DOMAIN
   sed -e "$ a INDEXER_DOMAIN=${INDEXER_DOMAIN}" .env
+fi
+
+if [ -z "$CONSOLE_DOMAIN" ]; then
+  echo -n "Enter your console domain:"
+  read CONSOLE_DOMAIN
+  sed -e "$ a CONSOLE_DOMAIN=${CONSOLE_DOMAIN}" .env
+fi
+
+if [ -z "$CONSOLE_PASSWORD" ]; then
+  echo -n "Enter your console password:"
+  read CONSOLE_PASSWORD
+  sed -e "$ a CONSOLE_DOMAIN=${CONSOLE_PASSWORD}" .env
 fi
 
 echo "build indexer-cli image. It might take 10mins."
