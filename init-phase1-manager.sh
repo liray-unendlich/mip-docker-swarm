@@ -34,6 +34,12 @@ if [ -z "$INDEXER_GEO" ]; then
   sed -e "$ a INDEXER_GEO=${INDEXER_GEO}" .env
 fi
 
+if [ -z "$INDEXER_DOMAIN" ]; then
+  echo -n "Enter your server location in LONGITUDE LATITUDE: like xx.xx yy.yy:"
+  read INDEXER_DOMAIN
+  sed -e "$ a INDEXER_DOMAIN=${INDEXER_DOMAIN}" .env
+fi
+
 echo "build indexer-cli image. It might take 10mins."
 docker build -t indexer-cli-console:0.1 ./indexer-console/.
 
