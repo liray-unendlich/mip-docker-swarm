@@ -11,12 +11,17 @@ scrape_configs:
     static_configs:
       - targets:
           ["indexer-gnosis_index-node:8040", "indexer-gnosis_query-node:8040"]
-
-  - job_name: "traefik"
+  - job_name: "graph-node-goerli"
     static_configs:
       - targets:
-          - "traefik:8080"
+          ["indexer_index-node-goerli:8040", "indexer_query-node-goerli:8040"]
+  - job_name: "indexer"
+    static_configs:
+      - targets: ["indexer_indexer-service:7300"]
+  - job_name: "traefik"
+    static_configs:
+      - targets: ["traefik:8080"]
   - job_name: "node-exporter"
     static_configs:
       - targets:
-          ["indexer-gnosis_node-exporter:9100"]
+          ["indexer-gnosis_node-exporter:9100", "indexer_node-exporter:9100"]
