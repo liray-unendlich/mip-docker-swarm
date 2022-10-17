@@ -81,7 +81,7 @@ docker config create config-$(date +"%Y%m%d") graph-node-config/config-$(date +"
 CHAIN_CONF_NAME=config-$(date +"%Y%m%d")
 
 echo "generate docker swarm configuration files(deployment/indexer-${CHAIN_NAME}.yml)"
-set -o allexport; source .env; CHAIN_NAME=$CHAIN_NAME; CHAIN_RPC= ${!NEW_RPC}; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/graph-node.tmpl.yml > deployment/indexer-${CHAIN_NAME}.yml
+set -o allexport; source .env; CHAIN_NAME=$CHAIN_NAME; CHAIN_RPC=${!NEW_RPC}; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/graph-node.tmpl.yml > deployment/indexer-${CHAIN_NAME}.yml
 
 CONSOLE_HASHED_PASSWORD=$(openssl passwd -apr1 $CONSOLE_PASSWORD)
 CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD//\$/\$\$}
