@@ -8,14 +8,14 @@ connection = "postgresql://${DB_USER}:${DB_PASSWORD}@postgres-indexer:5432/${DB_
 pool_size = 10
 
 [chains]
-ingestor = "index_node_${CHAIN_0_NAME}"
+ingestor = "index_node_${CHAIN_NAME}"
 
 [chains.goerli]
 shard = "indexer"
 ingestor = "index_node_goerli"
 provider = [ { label = "goerli", url = "${GOERLI_RPC}", features = ["archive"] } ]
 
-[chains.${CHAIN_0_NAME}]
+[chains.${CHAIN_NAME}]
 shard = "primary"
 ingestor = "index_node_${CHAIN_NAME}"
 provider = [ { label = "${CHAIN_NAME}", url = "${CHAIN_RPC}", features = ["archive", "traces"] } ]
