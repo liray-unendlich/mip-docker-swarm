@@ -107,7 +107,6 @@ services:
       GRAPH_KILL_IF_UNRESPONSIVE: "true"
       node_role: "index-node"
       node_id: "index_node_${CHAIN_NAME}"
-      BLOCK_INGESTOR: "index_node_${CHAIN_NAME}"
       RUST_LOG: INFO
       GRAPH_LOG: ${GRAPH_NODE_LOGLEVEL:-DEBUG}
       STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
