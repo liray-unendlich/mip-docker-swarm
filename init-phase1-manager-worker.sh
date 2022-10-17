@@ -9,7 +9,7 @@ source .env
 echo "You might need to enter several parameters for indexer-agent/service setup"
 
 if [ -z "$INDEXER_RPC" ]; then
-  echo -n "Enter goerli RPC API URL:"
+  echo -n "Enter goerli RPC API(Full Node) URL:"
   read INDEXER_RPC
   sed -i -e "$ a INDEXER_RPC=${INDEXER_RPC}" .env
 fi
@@ -54,6 +54,14 @@ if [ -z "$CONSOLE_PASSWORD" ]; then
   echo -n "Enter your console password:"
   read CONSOLE_PASSWORD
   sed -i -e "$ a CONSOLE_PASSWORD=${CONSOLE_PASSWORD}" .env
+fi
+
+echo "You also might need to enter RPC API URL for goerli(archive)"
+
+if [ -z "$CHAIN_GOERLI_RPC" ]; then
+  echo -n "Enter goerli RPC API(Archive Node) URL:"
+  read CHAIN_GOERLI_RPC
+  sed -i -e "$ a CHAIN_GOERLI_RPC=${CHAIN_GOERLI_RPC}" .env
 fi
 
 echo "build indexer-cli image. It might take 10mins."
