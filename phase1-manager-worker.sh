@@ -64,7 +64,7 @@ if [ -z "$CHAIN_GOERLI_RPC" ]; then
   sed -i -e "$ a CHAIN_GOERLI_RPC=${CHAIN_GOERLI_RPC}" .env
 fi
 
-echo "Please enter current/favor indexing chain(without goerli):"
+echo -n "Please enter current/favor indexing chain(without goerli):"
 read CHAIN_NAME
 NEW_RPC="CHAIN_${CHAIN_NAME^^}_RPC"
 
@@ -86,7 +86,7 @@ set -o allexport; source .env; CHAIN_NAME=$CHAIN_NAME; CHAIN_RPC=${!NEW_RPC}; CH
 CONSOLE_HASHED_PASSWORD=$(openssl passwd -apr1 $CONSOLE_PASSWORD)
 CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD//\$/\$\$}
 
-set -o allexport; source .env; CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD}; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml
+set -o allexport; source .env; CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD}; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml
 
 echo "build indexer-cli image. It might take 10mins. After that, we will deploy 2 stacks."
 docker build -t indexer-cli-console:0.1 ./indexer-console/.
