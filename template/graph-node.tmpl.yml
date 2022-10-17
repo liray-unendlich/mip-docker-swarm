@@ -26,7 +26,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.hostname == indexer-${CHAIN_0_NAME}
+          - node.hostname == indexer-${CHAIN_NAME}
       labels:
         - traefik.enable=false
       resources:
@@ -44,13 +44,13 @@ services:
   query-node:
     image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
     environment:
-      GRAPH_NODE_CONFIG: /var/config/config-${CHAIN_0_NAME}.toml
+      GRAPH_NODE_CONFIG: /var/config/config.toml
       postgres_host: "postgres"
       postgres_db: "${DB_NAME}"
       postgres_user: "${DB_USER}"
       postgres_pass: "${DB_PASSWORD}"
       ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
-      node_id: "query_node_${CHAIN_0_NAME}"
+      node_id: "query_node_${CHAIN_NAME}"
       node_role: "query-node"
       RUST_LOG: INFO
       GRAPH_LOG: INFO
@@ -70,7 +70,7 @@ services:
         max-file: "10"
     configs:
       - source: ${CHAIN_CONF_NAME}
-        target: /var/config/config-${CHAIN_0_NAME}.toml
+        target: /var/config/config.toml
     networks:
       - default
       - monitor
@@ -80,7 +80,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.hostname == indexer-${CHAIN_0_NAME}
+          - node.hostname == indexer-${CHAIN_NAME}
       labels:
         - traefik.enable=true
         - traefik.docker.network=traefik-public
@@ -98,7 +98,7 @@ services:
   index-node:
     image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
     environment:
-      GRAPH_NODE_CONFIG: /var/config/config-${CHAIN_0_NAME}.toml
+      GRAPH_NODE_CONFIG: /var/config/config.toml
       postgres_host: "postgres"
       postgres_db: "${DB_NAME}"
       postgres_user: "${DB_USER}"
@@ -106,8 +106,8 @@ services:
       ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
       GRAPH_KILL_IF_UNRESPONSIVE: "true"
       node_role: "index-node"
-      node_id: "index_node_${CHAIN_0_NAME}"
-      BLOCK_INGESTOR: "index_node_${CHAIN_0_NAME}"
+      node_id: "index_node_${CHAIN_NAME}"
+      BLOCK_INGESTOR: "index_node_${CHAIN_NAME}"
       RUST_LOG: INFO
       GRAPH_LOG: ${GRAPH_NODE_LOGLEVEL:-DEBUG}
       STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
@@ -125,7 +125,7 @@ services:
         max-file: "10"
     configs:
       - source: ${CHAIN_CONF_NAME}
-        target: /var/config/config-${CHAIN_0_NAME}.toml
+        target: /var/config/config.toml
     # Swarm
     networks:
       - default
@@ -135,7 +135,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.hostname == indexer-${CHAIN_0_NAME}
+          - node.hostname == indexer-${CHAIN_NAME}
 
   ############################################################################
   #                      node-exporter - Export data                         #
@@ -150,7 +150,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.hostname == indexer-${CHAIN_0_NAME}
+          - node.hostname == indexer-${CHAIN_NAME}
       resources:
         reservations:
           cpus: "0.1"
@@ -163,7 +163,7 @@ services:
 
 networks:
   default:
-    name: indexer_${CHAIN_0_NAME}_default
+    name: indexer_${CHAIN_NAME}_default
   monitor:
     external: true
   traefik-public:
