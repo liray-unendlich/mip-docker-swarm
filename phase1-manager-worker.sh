@@ -76,7 +76,7 @@ if [ -z "${!NEW_RPC}" ]; then
 fi
 
 echo "deploy configuration files"
-set -o allexport; source .env; CHAIN_NAME=$CHAIN_NAME; CHAIN_RPC= ${!NEW_RPC}; set +o allexport; envsubst < graph-node-config/config.tmpl > graph-node-config/config-$(date +"%Y%m%d").toml
+set -o allexport; source .env; CHAIN_NAME=$CHAIN_NAME; CHAIN_RPC=${!NEW_RPC}; set +o allexport; envsubst < graph-node-config/config.tmpl > graph-node-config/config-$(date +"%Y%m%d").toml
 docker config create config-$(date +"%Y%m%d") graph-node-config/config-$(date +"%Y%m%d").toml
 CHAIN_CONF_NAME=config-$(date +"%Y%m%d")
 

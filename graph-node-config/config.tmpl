@@ -13,7 +13,7 @@ ingestor = "index_node_${CHAIN_NAME}"
 [chains.goerli]
 shard = "indexer"
 ingestor = "index_node_goerli"
-provider = [ { label = "goerli", url = "${GOERLI_RPC}", features = ["archive"] } ]
+provider = [ { label = "goerli", url = "${CHAIN_GOERLI_RPC}", features = ["archive"] } ]
 
 [chains.${CHAIN_NAME}]
 shard = "primary"
