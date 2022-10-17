@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   ############################################################################
-  #                    POSTGRES - Database for index-agent                   #
+  #          POSTGRES - Database for index-agent/goerli-graph-node           #
   ############################################################################
   postgres-indexer:
     image: postgres:13.6
@@ -27,13 +27,95 @@ services:
           - node.hostname == indexer-manager
       labels:
         - traefik.enable=false
-      resources:
-        reservations:
-          cpus: "0.1"
-          memory: 1024M
     networks:
       - default
       - monitor
+
+  ############################################################################
+  #               GRAPHNODES - indexering and query of goerli                #
+  ############################################################################
+
+  query-node-goerli:
+    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
+    environment:
+      GRAPH_NODE_CONFIG: /var/config/config.toml
+      postgres_host: "postgres"
+      postgres_db: "${DB_NAME}"
+      postgres_user: "${DB_USER}"
+      postgres_pass: "${DB_PASSWORD}"
+      ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
+      node_id: "query_node_goerli"
+      node_role: "query-node"
+      RUST_LOG: INFO
+      GRAPH_LOG: INFO
+      GRAPH_ETH_CALL_GAS: 50000000
+      GRAPH_GETH_ETH_CALL_ERRORS: "out of gas"
+      GRAPH_MAX_GAS_PER_HANDLER: 1000000000000000
+      EXPERIMENTAL_SUBGRAPH_VERSION_SWITCHING_MODE: synced
+      GRAPH_KILL_IF_UNRESPONSIVE: "true"
+      DISABLE_BLOCK_INGESTOR: "true"
+      GRAPH_LOG_QUERY_TIMING: ${GRAPH_LOG_QUERY_TIMING:-gql}
+      GRAPH_ALLOW_NON_DETERMINISTIC_FULLTEXT_SEARCH: ${FULLTEXT_SEARCH:-true}
+      TZ: Asia/Tokyo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    configs:
+      - source: ${CHAIN_CONF_NAME}
+        target: /var/config/config.toml
+    networks:
+      - default
+      - monitor
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == indexer-manager
+
+  index-node-goerli:
+    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
+    environment:
+      GRAPH_NODE_CONFIG: /var/config/config.toml
+      postgres_host: "postgres"
+      postgres_db: "${DB_NAME}"
+      postgres_user: "${DB_USER}"
+      postgres_pass: "${DB_PASSWORD}"
+      ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
+      GRAPH_KILL_IF_UNRESPONSIVE: "true"
+      node_role: "index-node"
+      node_id: "index_node_goerli"
+      BLOCK_INGESTOR: "index_node_goerli"
+      RUST_LOG: INFO
+      GRAPH_LOG: ${GRAPH_NODE_LOGLEVEL:-DEBUG}
+      STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
+      ETHEREUM_TRACE_STREAM_STEP_SIZE: ${ETHEREUM_TRACE_STREAM_STEP_SIZE:-50}
+      ETHEREUM_BLOCK_BATCH_SIZE: ${ETHEREUM_BLOCK_BATCH_SIZE:-100}
+      ETHEREUM_RPC_MAX_PARALLEL_REQUESTS: ${ETHEREUM_RPC_MAX_PARALLEL_REQUESTS:-64}
+      GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE: ${GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE:-500}
+      GRAPH_ETHEREUM_TARGET_TRIGGERS_PER_BLOCK_RANGE: ${GRAPH_ETHEREUM_TARGET_TRIGGERS_PER_BLOCK_RANGE:-200}
+      GRAPH_ALLOW_NON_DETERMINISTIC_FULLTEXT_SEARCH: "true"
+      TZ: Asia/Tokyo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    configs:
+      - source: ${CHAIN_CONF_NAME}
+        target: /var/config/config.toml
+    # Swarm
+    networks:
+      - default
+      - monitor
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == indexer-manager
 
   ############################################################################
   #                         Indexer Agent/Service                            #
@@ -139,16 +221,54 @@ services:
       placement:
         constraints:
           - node.hostname == indexer-manager
-      resources:
-        reservations:
-          cpus: "0.1"
-          memory: 512M
       labels:
         - traefik.enable=false
     networks:
       - default
       - monitor
 
+  ############################################################################
+  #               indexer-console - WebUI for indexer-cli                    #
+  ############################################################################
+  console:
+    image: wrfly/container-web-tty:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - default
+      - traefik-public
+    logging:
+      driver: json-file
+    deploy:
+      labels:
+        traefik.http.routers.indexer-console-http.rule: Host(`${CONSOLE_DOMAIN}`)
+        traefik.http.middlewares.console-auth.basicauth.users: ${CONSOLE_USER}:${CONSOLE_HASHED_PASSWORD}
+        traefik.http.routers.indexer-console-https.entrypoints: https
+        traefik.http.routers.indexer-console-http.entrypoints: http
+        traefik.constraint-label: traefik-public
+        traefik.http.routers.indexer-console-https.tls.certresolver: le
+        traefik.http.routers.indexer-console-http.middlewares: https-redirect
+        traefik.docker.network: traefik-public
+        traefik.enable: "true"
+        traefik.http.routers.indexer-console-https.middlewares: console-auth
+        traefik.http.services.indexer-console.loadbalancer.server.port: "8080"
+        traefik.http.routers.indexer-console-https.tls: "true"
+        traefik.http.routers.indexer-console-https.rule: Host(`${CONSOLE_DOMAIN}`)
+      placement:
+        constraints:
+          - node.role == manager
+  indexer-cli:
+    image: indexer-cli-console:0.1
+    tty: true
+    networks:
+      - default
+      - monitor
+    logging:
+      driver: json-file
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 networks:
   default:
     name: indexer_default
