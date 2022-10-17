@@ -276,3 +276,6 @@ networks:
     external: true
   traefik-public:
     external: true
+configs:
+  ${CHAIN_CONF_NAME}:
+    external: true
