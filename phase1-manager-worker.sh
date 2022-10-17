@@ -64,15 +64,35 @@ if [ -z "$CHAIN_GOERLI_RPC" ]; then
   sed -i -e "$ a CHAIN_GOERLI_RPC=${CHAIN_GOERLI_RPC}" .env
 fi
 
-echo "build indexer-cli image. It might take 10mins."
-docker build -t indexer-cli-console:0.1 ./indexer-console/.
+echo "Please enter current/favor indexing chain(without goerli):"
+read CHAIN_NAME
+
+if [ -z "CHAIN_${!CHAIN_NAME}_RPC" ]; then
+  echo -n "Enter new chain RPC(Archive) URL:"
+  read CHAIN_${!CHAIN_NAME}_RPC
+  sed -i -e "$ a CHAIN_${!CHAIN_NAME}_RPC=${CHAIN_${!CHAIN_NAME}_RPC}" .env
+  echo "Entered `CHAIN_${!CHAIN_NAME}_RPC` is: `${CHAIN_${!CHAIN_NAME}_RPC}`"
+fi
+
+echo "deploy configuration files"
+set -o allexport; source .env; CHAIN_NAME=$CHAIN_NAME; CHAIN_RPC=${CHAIN_${!CHAIN_NAME}_RPC}; set +o allexport; envsubst < graphnode-config/config.tmpl > graph-node-config/config-$(date +"%Y%m%d").toml
+docker config create config-${CHAIN_NAME}-$(date +"%Y%m%d") graph-node-config/config-$(date +"%Y%m%d").toml
+CHAIN_CONF_NAME=config-$(date +"%Y%m%d")
+
+echo "generate docker swarm configuration files(deployment/indexer-${CHAIN_NAME}.yml)"
+set -o allexport; source .env; CHAIN_NAME=$CHAIN_NAME; CHAIN_RPC=$CHAIN_RPC; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/graph-node.tmpl.yml > deployment/indexer-${CHAIN_NAME}.yml
 
 CONSOLE_HASHED_PASSWORD=$(openssl passwd -apr1 $CONSOLE_PASSWORD)
 CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD//\$/\$\$}
 
 set -o allexport; source .env; CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD}; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml
 
-echo "deploy indexer and console"
+echo "build indexer-cli image. It might take 10mins. After that, we will deploy 2 stacks."
+docker build -t indexer-cli-console:0.1 ./indexer-console/.
+
+echo "deploy indexer-agent/service and console, indexer-${CHAIN_NAME}"
+docker stack deploy -c deployment/indexer-${CHAIN_NAME}.yml indexer-${CHAIN_NAME}
 docker stack deploy -c deployment/indexer.yml indexer
 
+echo "indexer, indexer-${CHAIN_NAME} stack was deployed"
 
