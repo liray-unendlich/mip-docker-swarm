@@ -42,7 +42,7 @@ services:
   ############################################################################
 
   query-node:
-    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.27.0}
+    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
     environment:
       GRAPH_NODE_CONFIG: /var/config/config-${CHAIN_0_NAME}.toml
       postgres_host: "postgres"
@@ -96,7 +96,7 @@ services:
   #        - traefik.http.middlewares.query-node-auth.basicauth.users=${PROMETHEUS_USER}:${PROMETHEUS_HASHED_PASSWORD?Variable not set}
 
   index-node:
-    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.27.0}
+    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
     environment:
       GRAPH_NODE_CONFIG: /var/config/config-${CHAIN_0_NAME}.toml
       postgres_host: "postgres"
@@ -117,8 +117,6 @@ services:
       GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE: ${GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE:-500}
       GRAPH_ETHEREUM_TARGET_TRIGGERS_PER_BLOCK_RANGE: ${GRAPH_ETHEREUM_TARGET_TRIGGERS_PER_BLOCK_RANGE:-200}
       GRAPH_ALLOW_NON_DETERMINISTIC_FULLTEXT_SEARCH: "true"
-      CHAIN_0_NAME: "${CHAIN_0_NAME}"
-      CHAIN_0_RPC: "${CHAIN_0_RPC}"
       TZ: Asia/Tokyo
     logging:
       driver: "json-file"
