@@ -94,7 +94,6 @@ services:
 
 networks:
   default:
-    name: swarmpit_default
   traefik-public:
     external: true
 
