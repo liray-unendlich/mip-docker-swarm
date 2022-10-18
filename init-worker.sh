@@ -23,8 +23,10 @@ sleep 10s
 
 echo -n "enter existing docker swarm token:"
 read DOCKER_SWARM_TOKEN
-echo -n "Enter existing docker swarm manager IP:"
+echo -n "Enter existing docker swarm manager IP(ONLY IP):"
 read DOCKER_SWARM_MANAGER_IP
+
+DOCKER_SWARM_MANAGER_IP="${DOCKER_SWARM_MANAGER_IP}:2377"
 
 docker swarm join --token $DOCKER_SWARM_TOKEN $DOCKER_SWARM_MANAGER_IP
 
