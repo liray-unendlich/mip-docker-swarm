@@ -38,8 +38,7 @@ docker config create prometheus-$(date +"%Y%m%d") prometheus/prometheus.yml
 PROMETHEUS_CONF_NAME=prometheus-$(date +"%Y%m%d")
 
 set -o allexport; source .env; TRAEFIK_HASHED_PASSWORD=${TRAEFIK_HASHED_PASSWORD}; set +o allexport; envsubst < ./template/traefik.tmpl.yml > deployment/traefik.yml
-(echo -e "version: '3.8'"; docker compose -f ./template/swarmpit.tmpl.yml --env-file .env config) > deployment/swarmpit.yml
-sed -i -e '2d' deployment/swarmpit.yml
+set -o allexport; source .env; ; set +o allexport; envsubst < ./template/swarmpit.tmpl.yml > deployment/swarmpit.yml
 
 echo "deploy traefik/swarmpit"
 docker stack deploy -c deployment/traefik.yml traefik
