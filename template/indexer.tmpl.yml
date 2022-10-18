@@ -142,6 +142,27 @@ services:
       - monitor
 
   ############################################################################
+  #                      postgres-exporter - Export data                     #
+  ############################################################################
+
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == indexer-manager
+      labels:
+        - traefik.enable=false
+    networks:
+      - default
+      - monitor
+
+  ############################################################################
   #               indexer-console - WebUI for indexer-cli                    #
   ############################################################################
   console:
