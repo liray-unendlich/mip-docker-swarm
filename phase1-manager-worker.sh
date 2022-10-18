@@ -64,7 +64,7 @@ if [ -z "$CHAIN_GOERLI_RPC" ]; then
   sed -i -e "$ a CHAIN_GOERLI_RPC=${CHAIN_GOERLI_RPC}" .env
 fi
 
-echo -n "Please enter current/favor indexing chain(without goerli):"
+echo -n "Please enter current/favor indexing chain(enter gnosis):"
 read CHAIN_NAME
 NEW_RPC="CHAIN_${CHAIN_NAME^^}_RPC"
 

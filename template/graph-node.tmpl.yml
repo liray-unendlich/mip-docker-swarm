@@ -99,6 +99,7 @@ services:
     image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
     environment:
       GRAPH_NODE_CONFIG: /var/config/config.toml
+      BLOCK_INGESTOR: "index_node_${CHAIN_NAME}"
       postgres_host: "postgres"
       postgres_db: "${DB_NAME}"
       postgres_user: "${DB_USER}"
