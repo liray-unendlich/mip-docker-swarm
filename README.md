@@ -57,6 +57,7 @@ sudo service docker restart
 sudo apt-get install -y git
 git clone https://github.com/liray-unendlich/mip-docker-swarm.git
 cd mip-docker-swarm
+git checkout phase1
 cp example.env .env
 ```
 
@@ -102,6 +103,8 @@ env(##5)で設定した"swarmpit.sld.tld"に接続してみましょう。する
 次に、実際に phase1 を完了するため、インデックスサーバーのインストールを行いましょう。
 
 ```
+git pull
+git checkout phase1
 chmod +x update-manager.sh phase1.sh
 bash update-manager.sh
 bash phase1.sh
