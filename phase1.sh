@@ -75,6 +75,9 @@ if [ -z "${!NEW_RPC}" ]; then
   echo "Entered ${CHAIN_NAME} RPC URL is: ${!NEW_RPC}"
 fi
 
+CONSOLE_HASHED_PASSWORD=$(openssl passwd -apr1 $CONSOLE_PASSWORD)
+CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD//\$/\$\$}
+
 echo "deploy configuration files"
 set -o allexport; source .env; CHAIN_NAME=$CHAIN_NAME; CHAIN_RPC=${!NEW_RPC}; set +o allexport; envsubst < graph-node-config/config.tmpl > graph-node-config/config-$(date +"%Y%m%d").toml
 docker config create config-$(date +"%Y%m%d") graph-node-config/config-$(date +"%Y%m%d").toml
@@ -82,22 +85,19 @@ CHAIN_CONF_NAME=config-$(date +"%Y%m%d")
 
 echo "generate docker swarm configuration files(deployment/indexer-${CHAIN_NAME}.yml)"
 set -o allexport; source .env; CHAIN_NAME=$CHAIN_NAME; CHAIN_RPC=${!NEW_RPC}; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/graph-node.tmpl.yml > deployment/indexer-${CHAIN_NAME}.yml
+set -o allexport; source .env; CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD}; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml
 
 echo "deploy indexer-${CHAIN_NAME}"
 docker stack deploy -c deployment/indexer-${CHAIN_NAME}.yml indexer-${CHAIN_NAME}
 
 echo "indexer-${CHAIN_NAME} stack was deployed"
-
-CONSOLE_HASHED_PASSWORD=$(openssl passwd -apr1 $CONSOLE_PASSWORD)
-CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD//\$/\$\$}
-
-set -o allexport; source .env; CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD}; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml
-
-echo "build indexer-cli image. It might take 10mins. After that, we will deploy 2 stacks."
-docker build -t indexer-cli-console:0.1 ./indexer-console/.
+sleep 30s
 
 echo "deploy indexer-agent/service and console"
 docker stack deploy -c deployment/indexer.yml indexer
+
+echo "link indexer ui"
+docker exec -it $(docker ps | grep indexer-cli | cut -c 1-12) graph indexer connect http://indexer-agent:8000
 
 echo "indexer stack was deployed"
 

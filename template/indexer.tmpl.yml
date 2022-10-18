@@ -193,7 +193,7 @@ services:
         constraints:
           - node.role == manager
   indexer-cli:
-    image: indexer-cli-console:0.1
+    image: ghcr.io/graphprotocol/indexer-cli:sha-4c31f45
     tty: true
     networks:
       - default
