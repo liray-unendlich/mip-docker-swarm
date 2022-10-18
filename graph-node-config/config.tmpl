@@ -14,5 +14,9 @@ provider = [ { label = "goerli", url = "${CHAIN_GOERLI_RPC}", features = ["archi
 shard = "primary"
 provider = [ { label = "${CHAIN_NAME}", url = "${CHAIN_RPC}", features = ["archive", "traces"] } ]
 
+[[deployment.rule]]
+shard = [ "primary" ]
+indexers = [ "index_node_${CHAIN_NAME}" ]
+
 [general]
 query = "query_node_*"
