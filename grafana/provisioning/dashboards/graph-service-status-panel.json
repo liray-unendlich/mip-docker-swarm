@@ -197,7 +197,7 @@
 				{
 					"datasource": "prometheus",
 					"editorMode": "code",
-					"expr": "ethereum_chain_head_number",
+					"expr": "ethereum_chain_head_number{instance=\"index-node:8040\"}",
 					"interval": "",
 					"legendFormat": "{{network}}",
 					"queryType": "randomWalk",
@@ -1425,7 +1425,7 @@
 			"datasource": "postgres",
 			"fontSize": "80%",
 			"gridPos": {
-				"h": 3,
+				"h": 5,
 				"w": 11,
 				"x": 13,
 				"y": 17
@@ -1528,7 +1528,7 @@
 				"h": 3,
 				"w": 11,
 				"x": 13,
-				"y": 20
+				"y": 22
 			},
 			"id": 26,
 			"links": [],
@@ -1943,7 +1943,7 @@
 				"h": 4,
 				"w": 9,
 				"x": 0,
-				"y": 23
+				"y": 25
 			},
 			"id": 20,
 			"links": [],
