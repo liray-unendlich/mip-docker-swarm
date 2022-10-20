@@ -31,6 +31,7 @@ MIP テストネットへの対応として、チェーンごとの別サーバ�
 | prometheus | prometheus.sld.tld | サーバー（マネージャー）の IP |
 | grafana | grafana.sld.tld | サーバー（マネージャー）の IP |
 | query | query.sld.tld | サーバー（マネージャー）の IP |
+| indexer | indexer.sld.tld | サーバー（マネージャー）の IP |
 | console | console.sld.tld | サーバー（マネージャー）の IP |
 
 ## 4. docker をインストールする
