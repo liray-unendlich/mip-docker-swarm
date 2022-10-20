@@ -202,16 +202,16 @@ ingestor = "index_node_gnosis"
 
 [chains.gnosis]
 shard = "primary"
-provider = [ { label = "gnosis-full", url = "gnosisのfull nodeアドレス", features = [] },
-             { label = "gnosis-archive", url = "gnosisのarchive nodeアドレス", features = ["archive"] },
-             { label = "gnosis-trace", url = "gnosisのarchive node(traceあり)アドレス", features = ["archive", "trace"] }
+provider = [ { label = "gnosis-full", url = "gnosisのfull nodeアドレス(ankr/chainstack)", features = [] },
+             { label = "gnosis-archive", url = "gnosisのarchive nodeアドレス(ankr/chainstack)", features = ["archive"] },
+             { label = "gnosis-trace", url = "gnosisのarchive node(traceあり)アドレス(chainstack)", features = ["archive", "trace"] }
            ]
 
 [chains.goerli]
 shard = "primary"
-provider = [ { label = "goerli-full", url = "goerliのfull nodeアドレス", features = [] },
-             { label = "goerli-archive", url = "goerliのarchive nodeアドレス", features = ["archive"] },
-             { label = "goerli-trace", url = "goerliのarchive node(traceあり)アドレス", features = ["archive", "trace"] }
+provider = [ { label = "goerli-full", url = "goerliのfull nodeアドレス(infura/alchemy/ankr/chainstack)", features = [] },
+             { label = "goerli-archive", url = "goerliのarchive nodeアドレス(alchemy/ankr)", features = ["archive"] },
+             { label = "goerli-trace", url = "goerliのarchive node(traceあり)アドレス(不明・とりあえず無くてOK)", features = ["archive", "trace"] }
            ]
 
 [deployment]
@@ -230,14 +230,6 @@ query = "query_node_*"
 | [] | フルノード |
 | archive | アーカイブノード |
 | traces | トレースが有効なノード（アーカイブノード） |
-
-```
-provider = [
-             { label = "gnosis", url = "フルノードのURL", features = [] },
-             { label = "gnosis", url = "ANKRのURL", features = ["archive"] },
-             { label = "gnosis", url = "CHAINSTACKのURL", features = ["archive", "traces"] }
-           ]
-```
 
 実際にgraph-nodeにこの設定を読み込ませるには、次の手続きでやる必要があります。
 1. swarmpitのstacksを選択
