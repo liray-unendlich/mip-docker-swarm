@@ -189,7 +189,7 @@ https://thegraphfoundation.notion.site/Phase-1-Indexer-Account-Setup-Protocol-In
 
 ### 複数の RPC API を使って接続したい
 
-swarmpit -> configs の中に、`config-gnosis-日付`というファイルが見つかるはずです。このファイルの中には、下のような情報が記載されています。この config ファイルを直接サービスに読み込ませることで、ファイルを直接サーバーに受け渡しせず、設定が可能になっています。
+swarmpit -> configs の中に、`config-日付`というファイルが見つかるはずです。このファイルの中には、下のような情報が記載されています。この config ファイルを直接サービスに読み込ませることで、ファイルを直接サーバーに受け渡しせず、設定が可能になっています。
 
 ```
 [store]
@@ -239,4 +239,11 @@ provider = [
            ]
 ```
 
-以上、様々な設定をしてみてください。
+実際にgraph-nodeにこの設定を読み込ませるには、次の手続きでやる必要があります。
+1. swarmpitのstacksを選択
+2. indexer-gnosisを選択
+3. 右上editを選択
+4. 全ての`config-日付`を新しいconfigの名前に修正
+5. deployを選択
+
+
