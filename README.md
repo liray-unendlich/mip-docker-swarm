@@ -30,6 +30,7 @@ MIP テストネットへの対応として、チェーンごとの別サーバ�
 | prometheus | prometheus.sld.tld | サーバー（マネージャー）の IP |
 | grafana | grafana.sld.tld | サーバー（マネージャー）の IP |
 | query | query.sld.tld | サーバー（マネージャー）の IP |
+| console | console.sld.tld | サーバー（マネージャー）の IP |
 
 ## 4. docker をインストールする
 
@@ -117,7 +118,7 @@ phase1.sh の実行時、次の情報を入力する必要があります（.env
 - 該当アドレスの mnemonic
 - インデクサーのサーバーの緯度、経度（（xx.xx yy.yy）の形式で入力してください）
 - インデクサーのドメイン
-- コンソールのドメイン
+- コンソールのドメイン（インデクサーを操作するためのコンソール。console.sld.tldで接続できます）
 - コンソールのユーザー名
 - コンソールのパスワード
 - goerli のアーカイブノード RPC API URL アドレス
