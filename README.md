@@ -113,7 +113,7 @@ bash phase1.sh
 
 phase1.sh の実行時、次の情報を入力する必要があります（.env に記載していれば不要です。一度 phase1.sh 実行時に入力すれば、.env に記載します）。
 
-- goerli の フルノード RPC API URL アドレス
+- goerli の フルノード RPC API URL アドレス(infuraとか)
 - インデクサーのアドレスとして使用する goerli ETH アドレス
 - 該当アドレスの mnemonic
 - インデクサーのサーバーの緯度、経度（（xx.xx yy.yy）の形式で入力してください）
@@ -121,7 +121,7 @@ phase1.sh の実行時、次の情報を入力する必要があります（.env
 - コンソールのドメイン（インデクサーを操作するためのコンソール。console.sld.tldで接続できます）
 - コンソールのユーザー名
 - コンソールのパスワード
-- goerli のアーカイブノード RPC API URL アドレス
+- goerli のアーカイブノード RPC API URL アドレス(alchemy/ankr/chainstack)
 - 同期するチェーン名（gnosis と入力してください）
 
 最初の phase1.sh 実行時は 10 分~15 分程度の時間がかかります。
