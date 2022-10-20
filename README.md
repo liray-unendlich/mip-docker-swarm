@@ -113,7 +113,7 @@ bash update-manager.sh
 bash phase1.sh
 ```
 
-phase1.sh の実行時、次の情報を入力する必要があります（.env に記載していれば不要です。一度 phase1.sh 実行時に入力すれば、.env に記載します）。
+phase1.sh の実行時、次の情報を入力する必要があります（.env に記載していれば不要です。一度 phase1.sh 実行時に入力すれば、.env に記載します）。それぞれの意味は、最下部に説明文を入れました。
 
 - goerli の フルノード RPC API URL アドレス(infuraとか)
 - インデクサーのアドレスとして使用する goerli ETH アドレス
@@ -247,3 +247,34 @@ provider = [
 5. deployを選択
 
 こうすると、トップページ -> Configs -> 追加したもの から、最下部を見るとどのサービスにリンクされるか表示されるので、ここでindex-node/query-nodeが追加されて入れば設定は完了です。
+
+### envファイルの設定事項について
+envファイルの設定事項がどんどん増えてきたので、以下に内容を列記します
+| サービス名 | 例 | 意味 |
+| :----------------------------: | :----------------------------: | :----------------------------: |
+| TRAEFIK_DOMAIN | traefik.sld.tld | traefik（ロードバランサー）のドメイン |
+| TRAEFIK_USER | admin | traefikのユーザー名 |
+| TRAEFIK_PASSWORD | password | traefikのパスワード |
+| TRAEFIK_EMAIL | email@gmail.com | SSL証明書取得用のメールアドレス |
+| SWARMPIT_DOMAIN | swarmpit.sld.tld | swarmpit（docker swarmのWebUI）のドメイン |
+| DB_NAME | graph | ブロックチェーンデータを格納する postgreSQLのデータベース名 |
+| DB_USER | user | postgreSQLのユーザー名 |
+| DB_PASSWORD | password | postgreSQLのパスワード |
+| GRAPH_NODE_VERSION | v0.28.0 | graph-node(index-node/query-node)のバージョン |
+| GRAPH_NODE_LOG_LEVEL | DEBUG | graph-node(index-node/query-node)のログレベル |
+| QUERY_NODE_DOMAIN | query.sld.tld | query-node（クエリ提供ノード）のドメイン |
+| PROMETHEUS_DOMAIN | prometheus.sld.tld | prometheus（クライアントモニタ）のドメイン |
+| PROMETHEUS_USER | user | prometheusのユーザー名 |
+| PROMETHEUS_PASSWORD | password | prometheusのパスワード |
+| GRAFANA_DOMAIN | grafana.sld.tld | grafana（監視ダッシュボード）の ドメイン |
+| INDEXER_RPC | https://infura.io | インデクサー用のgoerli RPC API(Full Node) |
+| INDEXER_ADDRESS | 0x.... | インデクサーのgoerli ETHアドレス |
+| INDEXER_MNEMONIC | 12 words | INDEXER_ADDRESS に紐づくmnemonic |
+| INDEXER_GEO | 49.414 11.171 | サーバー（マネージャー）の 緯度経度 |
+| INDEXER_DOMAIN | indexer.sld.tld | インデクサーのドメイン |
+| CONSOLE_DOMAIN | console.sld.tld | インデクサー操作用のコンソールのドメイン |
+| CONSOLE_USER | user | コンソールのユーザー名 |
+| CONSOLE_PASSWORD | password | コンソールのパスワード |
+| CHAIN_GOERLI_RPC | https://infura.io | goerli RPC API(Archive Node), ankr/alchemy |
+| CHAIN_GNOSIS_RPC | https://infura.io | gnosis RPC API(Archive Node), ankr/chainstack |
+
