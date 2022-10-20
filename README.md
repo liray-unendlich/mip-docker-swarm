@@ -131,11 +131,29 @@ phase1.sh の実行時、次の情報を入力する必要があります（.env
 
 このスクリプトが完了すると、6 で確認した swarmpit で、インデックスサービスの状態を見ることが出来るはずです。
 ![image](https://user-images.githubusercontent.com/15893314/193424539-076714c2-8dfb-4078-9cc7-2d6d60f4aa78.png)
-これにて、phase1 の Mission2 の途中までが完了します。
+これにて、phase1 の途中までが完了します。
 
-## 8. phase1 Mission2 をクリアする
+## 8. phase1 のミッションを確認する
 
-### インデクサー登録する
+phase1 では、次のミッションがあります。
+
+- 新しい goerli ETH アドレスを作る（Mission1）
+- The Graph のテストネットインデクサーになる（Mission2）
+- インデクサーとしての活動を開始し、収益化を開始する（Mission3）
+
+https://thegraphfoundation.notion.site/Phase-1-Indexer-Account-Setup-Protocol-Interaction-eba1c9d696fe4f9ba0e11de441914f0e
+
+をご確認ください。
+
+収益化については、また別途で記載します・・・・
+
+### phase1 Mission1をクリアする
+#### アドレスをフォームから提出する
+phase1 Mission1はフォーム(https://thegraph.typeform.com/to/LyTtvRqP )からgoerli ETH アドレスを提出することで完了できます
+
+### phase1 Mission2 をクリアする（2022/10/22以降）
+下は、2022/10/22以降に開始してください。
+#### インデクサー登録する
 
 https://testnet.thegraph.com でインデクサーになるため、200kGRT をステーキングする必要があります。
 
@@ -146,7 +164,7 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 
 これが完了すると、インデクサーとしての登録が完了します。※オペレーター設定はオプションなので、Mission 2 とは直接関係ありません。
 
-### オペレーターを設定する
+#### オペレーターを設定する
 
 次に、オペレーターとしてサブのウォレットを設定します（インデクサーウォレットとオペレーションウォレットを分ける人はこれをやるとよい）。
 
@@ -169,21 +187,7 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 
 実際にいろんな画面（特に Swarmpit と Grafana）を見てみてください。
 
-## 10. phase1 のミッションを確認する
-
-phase1 では、次のミッションがあります。
-
-- 新しい goerli ETH アドレスを作る
-- The Graph のテストネットインデクサーになる
-- インデクサーとしての活動を開始し、収益化を開始する
-
-https://thegraphfoundation.notion.site/Phase-1-Indexer-Account-Setup-Protocol-Interaction-eba1c9d696fe4f9ba0e11de441914f0e
-
-をご確認ください。
-
-収益化については、また別途で記載します・・・・
-
-## 11. もっとカスタムしたい人
+## 10. もっとカスタムしたいとき
 
 もっとカスタムしたい人向けに、簡単なメモを入れておきます。
 
