@@ -123,7 +123,7 @@ phase1.sh の実行時、次の情報を入力する必要があります（.env
 - コンソールのドメイン（インデクサーを操作するためのコンソール。console.sld.tldで接続できます）
 - コンソールのユーザー名
 - コンソールのパスワード
-- goerli のアーカイブノード RPC API URL アドレス(alchemy/ankr/chainstack)
+- goerli のアーカイブノード RPC API URL アドレス(alchemy/ankr)
 - 同期するチェーン名（gnosis と入力してください）
 
 最初の phase1.sh 実行時は 10 分~15 分程度の時間がかかります。
