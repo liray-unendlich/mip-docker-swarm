@@ -4,7 +4,8 @@ MIP テストネットへの対応として、チェーンごとの別サーバ�
 (最初は kubernetes でやろうとしたけどまだ慣れているこっちから作ることにしました）。
 
 構造は画像のとおり。
-![thegraph-mip-pic01](https://user-images.githubusercontent.com/15893314/193045327-07b08c45-a31e-4640-a26a-a95fe28f9a4c.png)
+![mip-powerpoint](https://user-images.githubusercontent.com/15893314/196847508-ed85f067-45ba-4881-a333-7f25209154ad.png)
+
 
 今回の構成では、Contabo Cloud VPS XL をチェーン数分＋マネージャーノード 1 台を借りて構成を作ることにしました（私は、ということなので皆さんは notion から見て大丈夫な性能で十分です）。
 最初のブランチ phase0 では、必要となるインデックスノード、クエリノードのみをホストします。
