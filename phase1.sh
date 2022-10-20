@@ -96,6 +96,8 @@ sleep 30s
 echo "deploy indexer-agent/service and console"
 docker stack deploy -c deployment/indexer.yml indexer
 
+sleep 30s
+
 echo "link indexer ui"
 docker exec -it $(docker ps | grep indexer-cli | cut -c 1-12) graph indexer connect http://indexer-agent:8000
 
