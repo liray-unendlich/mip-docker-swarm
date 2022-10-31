@@ -6,10 +6,6 @@ pool_size = 10
 [chains]
 ingestor = "index_node_${CHAIN_NAME}"
 
-[chains.goerli]
-shard = "primary"
-provider = [ { label = "goerli", url = "${CHAIN_GOERLI_RPC}", features = ["archive"] } ]
-
 [chains.${CHAIN_NAME}]
 shard = "primary"
 provider = [ { label = "${CHAIN_NAME}", url = "${CHAIN_RPC}", features = ["archive", "traces"] } ]

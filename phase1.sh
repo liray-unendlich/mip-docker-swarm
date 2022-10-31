@@ -56,14 +56,6 @@ if [ -z "$CONSOLE_PASSWORD" ]; then
   sed -i -e "$ a CONSOLE_PASSWORD=${CONSOLE_PASSWORD}" .env
 fi
 
-echo "You also might need to enter RPC API URL for goerli(archive)"
-
-if [ -z "$CHAIN_GOERLI_RPC" ]; then
-  echo -n "Enter goerli RPC API(Archive Node) URL:"
-  read CHAIN_GOERLI_RPC
-  sed -i -e "$ a CHAIN_GOERLI_RPC=${CHAIN_GOERLI_RPC}" .env
-fi
-
 echo -n "Please enter current/favor indexing chain(enter gnosis):"
 read CHAIN_NAME
 NEW_RPC="CHAIN_${CHAIN_NAME^^}_RPC"

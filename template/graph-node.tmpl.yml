@@ -74,7 +74,6 @@ services:
     networks:
       - default
       - monitor
-      - traefik-public
     deploy:
       mode: replicated
       replicas: 1
@@ -82,18 +81,7 @@ services:
         constraints:
           - node.hostname == indexer-${CHAIN_NAME}
       labels:
-        - traefik.enable=true
-        - traefik.docker.network=traefik-public
-        - traefik.constraint-label=traefik-public
-        - "traefik.http.routers.query-node-http.rule=Host(`${QUERY_NODE_DOMAIN}`)"
-        - traefik.http.routers.query-node-http.entrypoints=http
-        - traefik.http.routers.query-node-http.middlewares=https-redirect
-        - "traefik.http.routers.query-node-https.rule=Host(`${QUERY_NODE_DOMAIN}`)"
-        - traefik.http.routers.query-node-https.entrypoints=https
-        - traefik.http.routers.query-node-https.tls=true
-        - traefik.http.routers.query-node-https.tls.certresolver=le
-        - traefik.http.services.query-node.loadbalancer.server.port=8000
-  #        - traefik.http.middlewares.query-node-auth.basicauth.users=${PROMETHEUS_USER}:${PROMETHEUS_HASHED_PASSWORD?Variable not set}
+        - traefik.enable=false
 
   index-node:
     image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
