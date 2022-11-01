@@ -30,7 +30,6 @@ MIP テストネットへの対応として、チェーンごとの別サーバ�
 | swarmpit | swarmpit.sld.tld | サーバー（マネージャー）の IP |
 | prometheus | prometheus.sld.tld | サーバー（マネージャー）の IP |
 | grafana | grafana.sld.tld | サーバー（マネージャー）の IP |
-| query | query.sld.tld | サーバー（マネージャー）の IP |
 | indexer | indexer.sld.tld | サーバー（マネージャー）の IP |
 | console | console.sld.tld | サーバー（マネージャー）の IP |
 
@@ -123,7 +122,6 @@ phase1.sh の実行時、次の情報を入力する必要があります（.env
 - コンソールのドメイン（インデクサーを操作するためのコンソール。console.sld.tldで接続できます）
 - コンソールのユーザー名
 - コンソールのパスワード
-- goerli のアーカイブノード RPC API URL アドレス(alchemy/ankr)
 - 同期するチェーン名（gnosis と入力してください）
 
 最初の phase1.sh 実行時は 10 分~15 分程度の時間がかかります。
@@ -172,6 +170,20 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 1. 上の goerli ETH アドレスを設定した Metamask で接続する
 1. 右上のアバターをクリックする
 1. Operators ボタンをクリックし、+ ボタンを押して他のアドレスを追加する
+
+#### サブグラフへのアロケーション
+次に、サブグラフをインデックス開始するための手続きを説明します。
+コンソールのドメインを開き、入力したパスワードを使ってログインしましょう。
+1. コンソールにログインする
+2. imageがindexer-cliのものを選択し、container idをクリックする
+3. コンソールが開きます。次のコマンドを一行ずつ入力し、アロケーションを行いましょう。
+```
+graph indexer rules set QmW8Cbb2R4ZHWGsrYjNJKRjoKKcPeDTNK6rdipfQQaAhd6 allocationAmount 10000 decisionBasis always
+graph indexer rules set QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe allocationAmount 10000 decisionBasis always
+graph indexer rules set QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX allocationAmount 10000 decisionBasis always
+graph indexer rules set QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq allocationAmount 10000 decisionBasis always
+```
+このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaを確認すると、インデックスが開始しているはずです。
 
 ## 9. 使い方に慣れる
 
