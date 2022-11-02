@@ -30,7 +30,7 @@ MIP テストネットへの対応として、チェーンごとの別サーバ�
 | swarmpit | swarmpit.sld.tld | サーバー（マネージャー）の IP |
 | prometheus | prometheus.sld.tld | サーバー（マネージャー）の IP |
 | grafana | grafana.sld.tld | サーバー（マネージャー）の IP |
-| indexer | indexer.sld.tld | サーバー（マネージャー）の IP |
+| indexer | https://indexer.sld.tld | サーバー（マネージャー）の IP |
 | console | console.sld.tld | サーバー（マネージャー）の IP |
 
 ## 4. docker をインストールする
@@ -178,10 +178,10 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 2. imageがindexer-cliのものを選択し、container idをクリックする
 3. コンソールが開きます。次のコマンドを一行ずつ入力し、アロケーションを行いましょう。
 ```
-graph indexer rules set QmW8Cbb2R4ZHWGsrYjNJKRjoKKcPeDTNK6rdipfQQaAhd6 allocationAmount 10000 decisionBasis always
-graph indexer rules set QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe allocationAmount 10000 decisionBasis always
-graph indexer rules set QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX allocationAmount 10000 decisionBasis always
-graph indexer rules set QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq allocationAmount 10000 decisionBasis always
+graph indexer allocations create QmW8Cbb2R4ZHWGsrYjNJKRjoKKcPeDTNK6rdipfQQaAhd6 allocationAmount 割当たい枚数 index_node_gnosis
+graph indexer allocations create QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe allocationAmount 割当たい枚数 index_node_gnosis
+graph indexer allocations create QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX allocationAmount 割当たい枚数 index_node_gnosis
+graph indexer allocations create QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq allocationAmount 割当たい枚数 index_node_gnosis
 ```
 このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaを確認すると、インデックスが開始しているはずです。
 
