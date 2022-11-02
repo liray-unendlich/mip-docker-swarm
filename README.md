@@ -178,10 +178,10 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 2. imageがindexer-cliのものを選択し、container idをクリックする
 3. コンソールが開きます。次のコマンドを一行ずつ入力し、アロケーションを行いましょう。
 ```
-graph indexer allocations create QmW8Cbb2R4ZHWGsrYjNJKRjoKKcPeDTNK6rdipfQQaAhd6 allocationAmount 割当たい枚数 index_node_gnosis
-graph indexer allocations create QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe allocationAmount 割当たい枚数 index_node_gnosis
-graph indexer allocations create QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX allocationAmount 割当たい枚数 index_node_gnosis
-graph indexer allocations create QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq allocationAmount 割当たい枚数 index_node_gnosis
+graph indexer allocations create QmW8Cbb2R4ZHWGsrYjNJKRjoKKcPeDTNK6rdipfQQaAhd6 割当たい枚数 index_node_gnosis
+graph indexer allocations create QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe 割当たい枚数 index_node_gnosis
+graph indexer allocations create QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX 割当たい枚数 index_node_gnosis
+graph indexer allocations create QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq 割当たい枚数 index_node_gnosis
 ```
 このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaを確認すると、インデックスが開始しているはずです。
 
