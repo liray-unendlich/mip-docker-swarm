@@ -88,6 +88,26 @@ services:
         - traefik.http.routers.monitor-grafana-https.tls.certresolver=le
         - traefik.http.services.monitor-grafana.loadbalancer.server.port=3000
 
+  ############################################################################
+  #                      node-exporter - Export data                         #
+  ############################################################################
+
+  node-exporter:
+    image: prom/node-exporter
+    # Swarm
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == indexer-manager
+      labels:
+        - traefik.enable=false
+    networks:
+      - default
+      - monitor
+
 networks:
   default:
     name: monitor_default

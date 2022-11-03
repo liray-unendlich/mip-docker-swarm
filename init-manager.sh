@@ -13,9 +13,6 @@ echo "$PERMISSION_PASSWORD" | sudo -S ufw allow 4789
 echo "$PERMISSION_PASSWORD" | sudo -S ufw allow 7946
 echo "$PERMISSION_PASSWORD" | sudo -S ufw reload
 
-echo "change hostname to indexer-manager"
-echo "$PERMISSION_PASSWORD" | sudo -S hostname indexer-manager
-
 echo "initialize docker swarm"
 docker swarm init
 

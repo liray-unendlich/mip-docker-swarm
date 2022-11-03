@@ -1,5 +1,8 @@
 version: "3.5"
 services:
+  ############################################################################
+  #               indexer-console - WebUI for indexer-cli                    #
+  ############################################################################
   console:
     image: wrfly/container-web-tty:latest
     volumes:
@@ -27,16 +30,12 @@ services:
       placement:
         constraints:
           - node.role == manager
-      resources:
-        reservations:
-          memory: 128M
-        limits:
-          memory: 2048M
   indexer-cli:
-    image: indexer-cli-console:0.1
+    image: ghcr.io/graphprotocol/indexer-cli:v0.18.6
     tty: true
     networks:
       - default
+      - monitor
     logging:
       driver: json-file
     deploy:
@@ -47,4 +46,6 @@ networks:
   default:
     driver: overlay
   traefik-public:
+    external: true
+  monitor:
     external: true

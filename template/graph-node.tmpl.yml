@@ -1,7 +1,5 @@
 version: "3.5"
 services:
-  ### WE NEED CHANGE ALL constraints for single servers(like indexer-goerli/indexer-avax...)
-  ### SO, it should be constraints: [node.name == indexer-${CHAIN_N}]
   ############################################################################
   #                           POSTGRES - Database                            #
   ############################################################################
@@ -26,7 +24,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.hostname == indexer-${CHAIN_NAME}
+          - node.role == manager
       labels:
         - traefik.enable=false
       resources:
@@ -41,74 +39,18 @@ services:
   #                    GRAPHNODES - indexering and query                     #
   ############################################################################
 
-  query-node:
+  index-node-0:
     image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
     environment:
+      BLOCK_INGESTOR: index_node_${CHAIN_NAME}_0
       GRAPH_NODE_CONFIG: /var/config/config.toml
-      postgres_host: "postgres"
-      postgres_db: "${DB_NAME}"
-      postgres_user: "${DB_USER}"
-      postgres_pass: "${DB_PASSWORD}"
       ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
-      node_id: "query_node_${CHAIN_NAME}"
-      node_role: "query-node"
+      GRAPH_KILL_IF_UNRESPONSIVE: "true"
       RUST_LOG: INFO
       GRAPH_LOG: INFO
-      GRAPH_ETH_CALL_GAS: 50000000
-      GRAPH_GETH_ETH_CALL_ERRORS: "out of gas"
-      GRAPH_MAX_GAS_PER_HANDLER: 1000000000000000
-      EXPERIMENTAL_SUBGRAPH_VERSION_SWITCHING_MODE: synced
-      GRAPH_KILL_IF_UNRESPONSIVE: "true"
-      DISABLE_BLOCK_INGESTOR: "true"
-      GRAPH_LOG_QUERY_TIMING: ${GRAPH_LOG_QUERY_TIMING:-gql}
-      GRAPH_ALLOW_NON_DETERMINISTIC_FULLTEXT_SEARCH: ${FULLTEXT_SEARCH:-true}
-      TZ: Asia/Tokyo
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
-    configs:
-      - source: ${CHAIN_CONF_NAME}
-        target: /var/config/config.toml
-    networks:
-      - default
-      - monitor
-      - traefik-public
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.hostname == indexer-${CHAIN_NAME}
-      labels:
-        - traefik.enable=true
-        - traefik.docker.network=traefik-public
-        - traefik.constraint-label=traefik-public
-        - "traefik.http.routers.query-node-http.rule=Host(`${QUERY_NODE_DOMAIN}`)"
-        - traefik.http.routers.query-node-http.entrypoints=http
-        - traefik.http.routers.query-node-http.middlewares=https-redirect
-        - "traefik.http.routers.query-node-https.rule=Host(`${QUERY_NODE_DOMAIN}`)"
-        - traefik.http.routers.query-node-https.entrypoints=https
-        - traefik.http.routers.query-node-https.tls=true
-        - traefik.http.routers.query-node-https.tls.certresolver=le
-        - traefik.http.services.query-node.loadbalancer.server.port=8000
-  #        - traefik.http.middlewares.query-node-auth.basicauth.users=${PROMETHEUS_USER}:${PROMETHEUS_HASHED_PASSWORD?Variable not set}
-
-  index-node:
-    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
-    environment:
-      GRAPH_NODE_CONFIG: /var/config/config.toml
-      postgres_host: "postgres"
-      postgres_db: "${DB_NAME}"
-      postgres_user: "${DB_USER}"
-      postgres_pass: "${DB_PASSWORD}"
-      ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
-      GRAPH_KILL_IF_UNRESPONSIVE: "true"
+      GRAPH_NODE_ID: "index_node_${CHAIN_NAME}_0"
+      NODE_ID: "index_node_${CHAIN_NAME}_0"
       node_role: "index-node"
-      node_id: "index_node_${CHAIN_NAME}"
-      RUST_LOG: INFO
-      GRAPH_LOG: ${GRAPH_NODE_LOGLEVEL:-DEBUG}
       STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
       ETHEREUM_TRACE_STREAM_STEP_SIZE: ${ETHEREUM_TRACE_STREAM_STEP_SIZE:-50}
       ETHEREUM_BLOCK_BATCH_SIZE: ${ETHEREUM_BLOCK_BATCH_SIZE:-100}
@@ -134,7 +76,84 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.hostname == indexer-${CHAIN_NAME}
+          - node.role == manager
+
+  index-node-1:
+    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
+    environment:
+      DISABLE_BLOCK_INGESTOR: 'true'
+      GRAPH_NODE_CONFIG: /var/config/config.toml
+      ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
+      GRAPH_KILL_IF_UNRESPONSIVE: "true"
+      RUST_LOG: INFO
+      GRAPH_LOG: INFO
+      GRAPH_NODE_ID: "index_node_${CHAIN_NAME}_1"
+      NODE_ID: "index_node_${CHAIN_NAME}_1"
+      node_role: "index-node"
+      STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
+      ETHEREUM_TRACE_STREAM_STEP_SIZE: ${ETHEREUM_TRACE_STREAM_STEP_SIZE:-50}
+      ETHEREUM_BLOCK_BATCH_SIZE: ${ETHEREUM_BLOCK_BATCH_SIZE:-100}
+      ETHEREUM_RPC_MAX_PARALLEL_REQUESTS: ${ETHEREUM_RPC_MAX_PARALLEL_REQUESTS:-64}
+      GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE: ${GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE:-500}
+      GRAPH_ETHEREUM_TARGET_TRIGGERS_PER_BLOCK_RANGE: ${GRAPH_ETHEREUM_TARGET_TRIGGERS_PER_BLOCK_RANGE:-200}
+      GRAPH_ALLOW_NON_DETERMINISTIC_FULLTEXT_SEARCH: "true"
+      TZ: Asia/Tokyo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    configs:
+      - source: ${CHAIN_CONF_NAME}
+        target: /var/config/config.toml
+    # Swarm
+    networks:
+      - default
+      - monitor
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  query-node:
+    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
+    environment:
+      DISABLE_BLOCK_INGESTOR: 'true'
+      GRAPH_NODE_CONFIG: /var/config/config.toml
+      ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
+      RUST_LOG: INFO
+      GRAPH_LOG: INFO
+      GRAPH_NODE_ID: "query_node_${CHAIN_NAME}"
+      NODE_ID: "query_node_${CHAIN_NAME}"
+      node_role: "query-node"
+      GRAPH_ETH_CALL_GAS: 50000000
+      GRAPH_GETH_ETH_CALL_ERRORS: "out of gas"
+      GRAPH_MAX_GAS_PER_HANDLER: 1000000000000000
+      EXPERIMENTAL_SUBGRAPH_VERSION_SWITCHING_MODE: synced
+      GRAPH_KILL_IF_UNRESPONSIVE: "true"
+      DISABLE_BLOCK_INGESTOR: "true"
+      GRAPH_LOG_QUERY_TIMING: ${GRAPH_LOG_QUERY_TIMING:-gql}
+      GRAPH_ALLOW_NON_DETERMINISTIC_FULLTEXT_SEARCH: ${FULLTEXT_SEARCH:-true}
+      TZ: Asia/Tokyo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    configs:
+      - source: ${CHAIN_CONF_NAME}
+        target: /var/config/config.toml
+    networks:
+      - default
+      - monitor
+    deploy:
+      mode: replicated
+      replicas: 2
+      placement:
+        constraints:
+          - node.role == manager
 
   ############################################################################
   #                      node-exporter - Export data                         #
@@ -149,7 +168,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.hostname == indexer-${CHAIN_NAME}
+          - node.role == manager
       resources:
         reservations:
           cpus: "0.1"
@@ -162,10 +181,8 @@ services:
 
 networks:
   default:
-    name: indexer_${CHAIN_NAME}_default
+    name: indexer_default
   monitor:
-    external: true
-  traefik-public:
     external: true
 configs:
   ${CHAIN_CONF_NAME}:

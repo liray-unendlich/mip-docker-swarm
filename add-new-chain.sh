@@ -9,19 +9,19 @@ source .env
 echo "You might need to enter several parameters for indexer-agent/service setup"
 
 if [ -z "$INDEXER_RPC" ]; then
-  echo -n "Enter goerli RPC API(Full Node) URL:"
+  echo -n "Enter mainnet RPC API(Full Node) URL:"
   read INDEXER_RPC
   sed -i -e "$ a INDEXER_RPC=${INDEXER_RPC}" .env
 fi
 
 if [ -z "$INDEXER_ADDRESS" ]; then
-  echo -n "Enter indexer address on goerli:"
+  echo -n "Enter indexer address on mainnet:"
   read INDEXER_ADDRESS
   sed -i -e "$ a INDEXER_ADDRESS=${INDEXER_ADDRESS}" .env
 fi
 
 if [ -z "$INDEXER_MNEMONIC" ]; then
-  echo -n "Enter indexer mnemonic on goerli:"
+  echo -n "Enter indexer mnemonic on mainnet:"
   read INDEXER_MNEMONIC
   sed -i -e "$ a INDEXER_MNEMONIC=\"${INDEXER_MNEMONIC}\"" .env
 fi
@@ -56,15 +56,7 @@ if [ -z "$CONSOLE_PASSWORD" ]; then
   sed -i -e "$ a CONSOLE_PASSWORD=${CONSOLE_PASSWORD}" .env
 fi
 
-echo "You also might need to enter RPC API URL for goerli(archive)"
-
-if [ -z "$CHAIN_GOERLI_RPC" ]; then
-  echo -n "Enter goerli RPC API(Archive Node) URL:"
-  read CHAIN_GOERLI_RPC
-  sed -i -e "$ a CHAIN_GOERLI_RPC=${CHAIN_GOERLI_RPC}" .env
-fi
-
-echo -n "Please enter current/favor indexing chain(without goerli):"
+echo -n "Please enter current/favor indexing chain(like ethereum):"
 read CHAIN_NAME
 NEW_RPC="CHAIN_${CHAIN_NAME^^}_RPC"
 
@@ -88,16 +80,24 @@ docker stack deploy -c deployment/indexer-${CHAIN_NAME}.yml indexer-${CHAIN_NAME
 
 echo "indexer-${CHAIN_NAME} stack was deployed"
 
+sleep 15s
+
+# Generate new database with postgres
+docker exec -it $(docker ps | grep postgres | cut -c 1-12) PGPASSWORD=${DB_PASS} psql -U ${DB_USER} -d ${DB_NAME} -c "CREATE DATABASE indexer;"
+
 CONSOLE_HASHED_PASSWORD=$(openssl passwd -apr1 $CONSOLE_PASSWORD)
 CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD//\$/\$\$}
 
-set -o allexport; source .env; CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD}; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml
-
-echo "build indexer-cli image. It might take 10mins. After that, we will deploy 2 stacks."
-docker build -t indexer-cli-console:0.1 ./indexer-console/.
+set -o allexport; source .env; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml
+set -o allexport; source .env; CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD}; set +o allexport; envsubst < ./template/indexer-console.tmpl.yml > deployment/indexer-console.yml
 
 echo "deploy indexer-agent/service and console"
-docker stack deploy -c deployment/indexer.yml indexer
+docker stack deploy -c deployment/indexer.yml indexer-service
+docker stack deploy -c deployment/indexer-console.yml indexer-console
 
-echo "indexer stack was deployed"
+sleep 15s
+
+docker exec -it $(docker ps | grep indexer-cli | cut -c 1-12) graph indexer connect http://indexer-agent:8000
+
+echo "indexer-service stack was deployed"
 
