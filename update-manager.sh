@@ -8,6 +8,9 @@ mkdir -p data/postgres data/swarmpit/db-data data/swarmpit/influx-data data/trae
 mkdir -p deployment
 mkdir -p data/prometheus data/grafana
 
+# remove current monitor stack
+docker stack rm monitor
+
 source .env
 TRAEFIK_HASHED_PASSWORD=$(openssl passwd -apr1 $TRAEFIK_PASSWORD)
 PROMETHEUS_HASHED_PASSWORD=$(openssl passwd -apr1 $PROMETHEUS_PASSWORD)
