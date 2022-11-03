@@ -30,7 +30,7 @@ MIP テストネットへの対応として、チェーンごとの別サーバ�
 | swarmpit | swarmpit.sld.tld | サーバー（マネージャー）の IP |
 | prometheus | prometheus.sld.tld | サーバー（マネージャー）の IP |
 | grafana | grafana.sld.tld | サーバー（マネージャー）の IP |
-| indexer | https://indexer.sld.tld | サーバー（マネージャー）の IP |
+| indexer | indexer.sld.tld | サーバー（マネージャー）の IP |
 | console | console.sld.tld | サーバー（マネージャー）の IP |
 
 ## 4. docker をインストールする
@@ -137,20 +137,17 @@ phase1 では、次のミッションがあります。
 
 - 新しい goerli ETH アドレスを作る（Mission1）
 - The Graph のテストネットインデクサーになる（Mission2）
-- インデクサーとしての活動を開始し、収益化を開始する（Mission3）
+- インデクサーとしての活動を開始する（Mission3）
 
 https://thegraphfoundation.notion.site/Phase-1-Indexer-Account-Setup-Protocol-Interaction-eba1c9d696fe4f9ba0e11de441914f0e
 
 をご確認ください。
 
-収益化については、また別途で記載します・・・・
+**2022/11/03 現在、既にクエリ送出テストが開始されているようです。**
 
-### phase1 Mission1をクリアする
-#### アドレスをフォームから提出する
-phase1 Mission1はフォーム(https://thegraph.typeform.com/to/LyTtvRqP )からgoerli ETH アドレスを提出することで完了できます
+### phase1 Mission1をクリアする（もう終わってます）
 
-### phase1 Mission2 をクリアする（2022/10/22以降）
-下は、2022/10/22以降に開始してください。
+### phase1 Mission2 をクリアする
 #### インデクサー登録する
 
 https://testnet.thegraph.com でインデクサーになるため、200kGRT をステーキングする必要があります。
@@ -183,7 +180,7 @@ graph indexer allocations create QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe 
 graph indexer allocations create QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX 割当たい枚数 index_node_gnosis
 graph indexer allocations create QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq 割当たい枚数 index_node_gnosis
 ```
-このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaを確認すると、インデックスが開始しているはずです。
+このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaのダッシュボードで、を確認すると、インデックスが開始しているはずです。
 
 ## 9. 使い方に慣れる
 
