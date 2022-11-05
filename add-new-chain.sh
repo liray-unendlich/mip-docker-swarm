@@ -90,6 +90,7 @@ CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD//\$/\$\$}
 
 set -o allexport; source .env; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml
 set -o allexport; source .env; CONSOLE_HASHED_PASSWORD=${CONSOLE_HASHED_PASSWORD}; set +o allexport; envsubst < ./template/indexer-console.tmpl.yml > deployment/indexer-console.yml
+cp ./template/default.tmpl.agora > deployment/default.agora
 
 echo "deploy indexer-agent/service and console"
 docker stack deploy -c deployment/indexer.yml indexer-service

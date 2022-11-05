@@ -5,3 +5,7 @@
 
 # ignore config.toml without config.tmpl
 *.toml
+
+# ignore agora without default.tmpl.agora
+*.agora
+!default.tmpl.agora

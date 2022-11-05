@@ -32,10 +32,13 @@ services:
           - node.role == manager
   indexer-cli:
     image: ghcr.io/graphprotocol/indexer-cli:v0.18.6
+    user: $USER_ID:$GROUP_ID
     tty: true
     networks:
       - default
       - monitor
+    volumes:
+      - ../deployment/default.agora:/home/graph/default.agora:ro
     logging:
       driver: json-file
     deploy:
