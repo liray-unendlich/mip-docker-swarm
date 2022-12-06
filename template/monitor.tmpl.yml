@@ -37,16 +37,12 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
-        - "traefik.http.routers.monitor-prometheus-http.rule=Host(`${PROMETHEUS_DOMAIN}`)"
-        - traefik.http.routers.monitor-prometheus-http.entrypoints=http
-        - traefik.http.routers.monitor-prometheus-http.middlewares=https-redirect
-        - "traefik.http.routers.monitor-prometheus-https.rule=Host(`${PROMETHEUS_DOMAIN}`)"
-        - traefik.http.routers.monitor-prometheus-https.entrypoints=https
-        - traefik.http.routers.monitor-prometheus-https.tls=true
-        - traefik.http.routers.monitor-prometheus-https.tls.certresolver=le
-        - traefik.http.services.monitor-prometheus.loadbalancer.server.port=9090
-        - traefik.http.routers.monitor-prometheus-https.middlewares=prometheus-auth
-        - traefik.http.middlewares.prometheus-auth.basicauth.users=${PROMETHEUS_USER}:${PROMETHEUS_HASHED_PASSWORD}
+        - traefik.http.routers.prometheus.middlewares=authelia@docker
+        - traefik.https.routers.prometheus.rule=Host(`${PROMETHEUS_DOMAIN}`)
+        - traefik.http.routers.prometheus.entrypoints=https
+        - traefik.http.routers.prometheus.tls=true
+        - traefik.http.routers.prometheus.tls.certresolver=le
+        - traefik.http.services.prometheus.loadbalancer.server.port=9090
 
   grafana:
     image: grafana/grafana
@@ -56,6 +52,8 @@ services:
       postgres_db: "${DB_NAME}"
       postgres_user: "${DB_USER}"
       postgres_pass: "${DB_PASSWORD}"
+      GF_SERVER_ROOT_URL: https://${GRAFANA_DOMAIN}
+      GF_SERVER_DOMAIN: ${GRAFANA_DOMAIN}
     volumes:
       - ../grafana:/etc/grafana/
       - ../data/grafana:/var/lib/grafana
@@ -79,14 +77,12 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
-        - "traefik.http.routers.monitor-grafana-http.rule=Host(`${GRAFANA_DOMAIN}`)"
-        - traefik.http.routers.monitor-grafana-http.entrypoints=http
-        - traefik.http.routers.monitor-grafana-http.middlewares=https-redirect
-        - "traefik.http.routers.monitor-grafana-https.rule=Host(`${GRAFANA_DOMAIN}`)"
-        - traefik.http.routers.monitor-grafana-https.entrypoints=https
-        - traefik.http.routers.monitor-grafana-https.tls=true
-        - traefik.http.routers.monitor-grafana-https.tls.certresolver=le
-        - traefik.http.services.monitor-grafana.loadbalancer.server.port=3000
+        - traefik.http.routers.grafana.middlewares=authelia@docker
+        - traefik.https.routers.grafana.rule=Host(`${GRAFANA_DOMAIN}`)
+        - traefik.http.routers.grafana.entrypoints=https
+        - traefik.http.routers.grafana.tls=true
+        - traefik.http.routers.grafana.tls.certresolver=le
+        - traefik.http.services.grafana.loadbalancer.server.port=3000
 
   ############################################################################
   #                      node-exporter - Export data                         #

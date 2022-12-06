@@ -1,0 +1,46 @@
+version: "3.3"
+
+services:
+  portainer:
+    image: authelia/authelia:latest
+    networks:
+      - agent-network
+      - traefik-public
+    volumes:
+      - ../data/authelia/config:/config
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        traefik.enable: true
+        traefik.docker.network: traefik-public
+        traefik.constraint-label: traefik-public
+        traefik.http.routers.authelia.rule: Host(`${AUTHELIA_DOMAIN}`)
+        traefik.http.routers.authelia.tls.certresolver: le
+        traefik.http.middlewares.authelia.forwardauth.trustForwardHeader: "true"
+        traefik.http.routers.authelia.tls: "true"
+        traefik.http.routers.authelia.entrypoints: https
+        traefik.http.services.authelia.loadbalancer.server.port: "9091"
+        traefik.http.middlewares.authelia.forwardauth.authResponseHeaders: Remote-User,Remote-Groups,Remote-Name,Remote-Email
+        traefik.http.middlewares.authelia.forwardauth.address: http://authelia:9091/api/verify?rd=https://indexer.auth.gunu-node.com
+
+  redis:
+    image: redis:alpine
+    user: 1000:1000
+    volumes:
+      - ../data/authelia/redis:/data
+    networks:
+      - default
+    logging:
+      driver: json-file
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  default:
+    driver: overlay
+  traefik-public:
+    external: true
