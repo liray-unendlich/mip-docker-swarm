@@ -10,6 +10,8 @@ services:
     networks:
       - agent-network
       - traefik-public
+    volumes:
+      - portainer-data:/data
     deploy:
       resources:
         limits:
@@ -54,7 +56,5 @@ networks:
     external: true
 
 volumes:
-  db-data:
-    driver: local
-  influx-data:
+  portainer-data:
     driver: local
