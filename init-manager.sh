@@ -30,7 +30,7 @@ docker config create prometheus-$(date +"%Y%m%d") prometheus/prometheus.yml
 PROMETHEUS_CONF_NAME=prometheus-$(date +"%Y%m%d")
 
 set -o allexport; source .env; set +o allexport; envsubst < ./template/authelia.tmpl.yml > deployment/authelia.yml
-set -o allexport; source .env; set +o allexport; envsubst < ./template/monitor.tmpl.yml > deployment/monitor.yml
+set -o allexport; source .env; PROMETHEUS_CONF_NAME=${PROMETHEUS_CONF_NAME}; set +o allexport; envsubst < ./template/monitor.tmpl.yml > deployment/monitor.yml
 set -o allexport; source .env; set +o allexport; envsubst < ./template/portainer.tmpl.yml > deployment/portainer.yml
 set -o allexport; source .env; set +o allexport; envsubst < ./template/traefik.tmpl.yml > deployment/traefik.yml
 
