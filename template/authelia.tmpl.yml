@@ -34,7 +34,7 @@ services:
         constraints:
           - node.role == manager
       labels:
-        traefik.enable: true
+        traefik.enable: "true"
         traefik.docker.network: traefik-public
         traefik.constraint-label: traefik-public
         traefik.http.routers.authelia.rule: Host(`auth.${ROOT_DOMAIN}`)
