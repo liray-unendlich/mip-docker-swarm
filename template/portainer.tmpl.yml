@@ -3,6 +3,7 @@ version: "3.3"
 services:
   portainer:
     image: portainer/portainer-ce:2.16.2
+    user: $USER_ID:$GROUP_ID
     command:
       - -H
       - tcp://tasks.agent:9001

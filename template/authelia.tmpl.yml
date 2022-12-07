@@ -3,6 +3,7 @@ version: "3.3"
 services:
   authelia:
     image: authelia/authelia:latest
+    user: $USER_ID:$GROUP_ID
     networks:
       - traefik-public
       - monitor
@@ -47,7 +48,7 @@ services:
 
   redis:
     image: redis:alpine
-    user: 1000:1000
+    user: $USER_ID:$GROUP_ID
     volumes:
       - ../data/authelia/redis:/data
     networks:
