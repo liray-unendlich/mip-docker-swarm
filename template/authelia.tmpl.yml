@@ -1,13 +1,33 @@
 version: "3.3"
 
 services:
-  portainer:
+  authelia:
     image: authelia/authelia:latest
     networks:
-      - agent-network
       - traefik-public
+      - monitor
     volumes:
       - ../data/authelia/config:/config
+    environment:
+      AUTHELIA_JWT_SECRET_FILE: /secrets/JWT_SECRET
+      AUTHELIA_SESSION_SECRET_FILE: /secrets/SESSION_SECRET
+      AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE: /secrets/STORAGE_POSTGRES_PASSWORD
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /secrets/STORAGE_ENCRYPTION_KEY
+      AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: /secrets/OIDC_HMAC_SECRET
+      AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE: /secrets/OIDC_ISSUER_PRIVATE_KEY
+    secrets:
+      - source: jwt_secret
+        target: /secret/JWT_SECRET
+      - source: session_secret
+        target: /secret/SESSION_SECRET
+      - source: storage_postgres_password
+        target: /secret/STORAGE_POSTGRES_PASSWORD
+      - source: storage_encryption_key
+        target: /secret/STORAGE_ENCRYPTION_KEY
+      - source: oidc_hmac_secret
+        target: /secret/OIDC_HMAC_SECRET
+      - source: oidc_issuer_private_key
+        target: /secret/OIDC_ISSUER_PRIVATE_KEY
     deploy:
       placement:
         constraints:
@@ -16,14 +36,14 @@ services:
         traefik.enable: true
         traefik.docker.network: traefik-public
         traefik.constraint-label: traefik-public
-        traefik.http.routers.authelia.rule: Host(`${AUTHELIA_DOMAIN}`)
+        traefik.http.routers.authelia.rule: Host(`auth.${ROOT_DOMAIN}`)
         traefik.http.routers.authelia.tls.certresolver: le
         traefik.http.middlewares.authelia.forwardauth.trustForwardHeader: "true"
         traefik.http.routers.authelia.tls: "true"
         traefik.http.routers.authelia.entrypoints: https
         traefik.http.services.authelia.loadbalancer.server.port: "9091"
         traefik.http.middlewares.authelia.forwardauth.authResponseHeaders: Remote-User,Remote-Groups,Remote-Name,Remote-Email
-        traefik.http.middlewares.authelia.forwardauth.address: http://authelia:9091/api/verify?rd=https://indexer.auth.gunu-node.com
+        traefik.http.middlewares.authelia.forwardauth.address: http://authelia:9091/api/verify?rd=https://auth.${ROOT_DOMAIN}
 
   redis:
     image: redis:alpine
@@ -39,8 +59,59 @@ services:
         constraints:
           - node.role == manager
 
+  postgres-auth:
+    image: postgres:13.6
+    user: $USER_ID:$GROUP_ID
+    command:
+      - "postgres"
+      - "-cshared_preload_libraries=pg_stat_statements"
+    environment:
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_DB: "authelia"
+      POSTGRES_USER: "authelia"
+      POSTGRES_PASSWORD_FILE: /secrets/STORAGE_POSTGRES_PASSWORD
+      TZ: Asia/Tokyo
+    volumes:
+      - ../data/authelia/postgres:/var/lib/postgresql/data
+    secrets:
+      - source: storage_postgres_password
+        target: /secret/STORAGE_POSTGRES_PASSWORD
+    # Swarm
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=false
+      resources:
+        reservations:
+          cpus: "0.1"
+          memory: 1024M
+    networks:
+      - default
+      - monitor
+
 networks:
   default:
     driver: overlay
   traefik-public:
+    external: true
+  monitor:
+    external: true
+
+secrets:
+  jwt_secret:
+    external: true
+  session_secret:
+    external: true
+  storage_postgres_password:
+    external: true
+  storage_encryption_key:
+    external: true
+  oidc_hmac_secret:
+    external: true
+  oidc_issuer_private_key:
     external: true

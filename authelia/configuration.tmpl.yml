@@ -1,0 +1,163 @@
+###############################################################
+#                   Authelia configuration                    #
+###############################################################
+
+## The theme to display: light, dark, grey, auto.
+theme: dark
+
+# If you use docker secret, we can comment out
+# This secret can also be set using the env variables AUTHELIA_JWT_SECRET_FILE
+# jwt_secret: a_very_important_secret
+default_redirection_url: ${REDIRECT_URL_DEFAULT}
+default_2fa_method: "totp"
+
+server:
+  host: 0.0.0.0
+  port: 9091
+
+# Telemetry Configuration
+telemetry:
+  metrics:
+    enabled: true
+    address: tcp://0.0.0.0:9959
+
+log:
+  level: debug
+
+totp:
+  disable: false
+  issuer: authelia.com
+  algorithm: sha1
+  digits: 6
+  period: 30
+  skew: 1
+  secret_size: 32
+
+webauthn:
+  disable: true
+
+duo_api:
+  disable: true
+
+##
+## NTP Configuration
+##
+## This is used to validate the servers time is accurate enough to validate TOTP.
+ntp:
+  ## NTP server address.
+  address: "ntp.nict.jp"
+  ## NTP version
+  version: 4
+  ## Maximum allowed time offset between the host and the NTP server.
+  max_desync: 3s
+  ## Disables the NTP check on startup entirely. This means Authelia will not contact a remote service at all if you
+  disable_startup_check: false
+  ## The default of false will prevent startup only if we can contact the NTP server and the time is out of sync with
+  ## the NTP server more than the configured max_desync. If you set this to true, an error will be logged but startup
+  ## will continue regardless of results.
+  disable_failure: false
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+
+access_control:
+  default_policy: deny
+  rules:
+    # Rules applied to everyone
+    - domain: "indexer.${ROOT_DOMAIN}"
+      domain_regex: '^api\.*\.${ROOT_DOMAIN}'
+      policy: bypass
+    - domain:
+        [
+          "portainer.${ROOT_DOMAIN}",
+          "traefik.${ROOT_DOMAIN}",
+          "prometheus.${ROOT_DOMAIN}",
+          "grafana.${ROOT_DOMAIN}",
+        ]
+      policy: two_factor
+
+session:
+  name: authelia_session
+  # This secret can also be set using the env variables AUTHELIA_SESSION_SECRET_FILE
+  # Should match whatever your root protected domain is
+  domain: ${ROOT_DOMAIN}
+  ## The secret to encrypt the session data. This is only used with Redis / Redis Sentinel.
+  ## Secret can also be set using a secret: https://www.authelia.com/c/secrets
+  # secret: unsecure_session_secret
+  expiration: 1h # 1 hour
+  inactivity: 5m # 5 minutes
+
+  redis:
+    host: redis
+    port: 6379
+    # This secret can also be set using the env variables AUTHELIA_SESSION_REDIS_PASSWORD_FILE
+    # password: authelia
+
+regulation:
+  max_retries: 3
+  find_time: 120
+  ban_time: 300
+
+# chose storage provider. in this case, we use postgresql
+storage:
+  ## The encryption key that is used to encrypt sensitive information in the database. Must be a string with a minimum
+  ## length of 20. Please see the docs if you configure this with an undesirable key and need to change it, you MUST use
+  ## the CLI to change this in the database if you want to change it from a previously configured value.
+  # encryption_key: you_must_generate_a_random_string_of_more_than_twenty_chars_and_configure_this
+  postgres:
+    host: postgres-auth
+    port: 5432
+    database: authelia
+    schema: public
+    username: authelia
+    # password can be set with secret
+    # password: password
+    timeout: 5s
+
+notifier:
+  disable_startup_check: false
+  smtp:
+    username: ${SMTP_USERNAME}
+    # This secret can also be set using the env variables AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
+    password: ${SMTP_PASSWORD}
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    sender: ${AUTHELIA_EMAIL}
+
+identity_providers:
+  oidc:
+    # This secret can also be set using the env variables AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE
+    # hmac_secret: this_is_a_secret_a0e4633a573ef2aa1b6cfa63df6e12ccc5bc7b592d484cdbfbcaf276ee9305c505c9e1285a0cd910d109faceb1b2d7bce18bd03
+    # This secret can also be set using the env variables AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE
+    #issuer_private_key: |
+    #  -----BEGIN RSA PRIVATE KEY-----
+    #  DO_NOT_USE_THIS
+    #  i5WlGGf7xhoR09iNGpIQVt+0QPCT7vzDhwVtqTENRFk6kDG6oQltm9ctbg==
+    #  -----END RSA PRIVATE KEY-----
+    enable_client_debug_messages: true
+    enforce_pkce: public_clients_only
+    cors:
+      endpoints:
+        - authorization
+        - token
+        - revocation
+        - introspection
+      allowed_origins:
+        - https://${ROOT_DOMAIN}
+      allowed_origins_from_client_redirect_uris: false
+    clients:
+      - id: portainer
+        description: Portainer
+        secret: "$plaintext$${PORTAINER_CLIENT_SECRET}"
+        public: false
+        authorization_policy: two_factor
+        audience: []
+        redirect_uris:
+          - https://portainer.${ROOT_DOMAIN}
+        scopes:
+          - openid
+          - profile
+          - groups
+          - email
+        userinfo_signing_algorithm: none
