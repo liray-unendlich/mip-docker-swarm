@@ -155,30 +155,6 @@ services:
         constraints:
           - node.role == manager
 
-  ############################################################################
-  #                      node-exporter - Export data                         #
-  ############################################################################
-
-  node-exporter:
-    image: prom/node-exporter
-    # Swarm
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.role == manager
-      resources:
-        reservations:
-          cpus: "0.1"
-          memory: 512M
-      labels:
-        - traefik.enable=false
-    networks:
-      - default
-      - monitor
-
 networks:
   default:
     name: indexer_default
