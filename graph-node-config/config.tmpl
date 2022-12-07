@@ -1,10 +1,25 @@
-[store]
+[store] # In this category, you need to set up your postgres URI. First database must be primary.
 [store.primary]
 connection = "postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}"
 pool_size = 10
 
 [chains]
+# ingestor: single graph-node(block syncer) with all indexing blockchain
 ingestor = "index_node_${CHAIN_NAME}_0"
+
+# Example
+# [chains.ethereum]
+# shard = "primary" : it must be same as [store.XXX]
+# provider: blockchain Node RPC API.
+# provider = [
+#              { label = "erigon", url="http://IP:PORT", features = ["archive", "traces"] },
+#              { label = "alchemy", url="http://IP:PORT", features = ["archive"] }
+#            ]
+# [[deployment.rule]] : it set a rule of subgraph syncing = deployment
+# shard = [ "primary" ]: it must be same as [store.XXX]
+# indexers = [ "index_node_0", "index_node_1" ]: it must be same collection of index-node as your graph-node.yml
+# [general] : it set the collection of query-node ids.
+# query = "query_node_*" : it uses regex
 
 [chains.${CHAIN_NAME}]
 shard = "primary"
