@@ -38,7 +38,7 @@ services:
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
         - traefik.http.routers.prometheus.middlewares=authelia@docker
-        - traefik.https.routers.prometheus.rule=Host(`${PROMETHEUS_DOMAIN}`)
+        - traefik.https.routers.prometheus.rule=Host(`prometheus.${ROOT_DOMAIN}`)
         - traefik.http.routers.prometheus.entrypoints=https
         - traefik.http.routers.prometheus.tls=true
         - traefik.http.routers.prometheus.tls.certresolver=le
@@ -52,8 +52,8 @@ services:
       postgres_db: "${DB_NAME}"
       postgres_user: "${DB_USER}"
       postgres_pass: "${DB_PASSWORD}"
-      GF_SERVER_ROOT_URL: https://${GRAFANA_DOMAIN}
-      GF_SERVER_DOMAIN: ${GRAFANA_DOMAIN}
+      GF_SERVER_ROOT_URL: https://grafana.${ROOT_DOMAIN}
+      GF_SERVER_DOMAIN: grafana.${ROOT_DOMAIN}
     volumes:
       - ../grafana:/etc/grafana/
       - ../data/grafana:/var/lib/grafana
@@ -78,7 +78,7 @@ services:
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
         - traefik.http.routers.grafana.middlewares=authelia@docker
-        - traefik.https.routers.grafana.rule=Host(`${GRAFANA_DOMAIN}`)
+        - traefik.https.routers.grafana.rule=Host(`grafana.${ROOT_DOMAIN}`)
         - traefik.http.routers.grafana.entrypoints=https
         - traefik.http.routers.grafana.tls=true
         - traefik.http.routers.grafana.tls.certresolver=le

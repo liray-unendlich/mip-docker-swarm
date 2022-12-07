@@ -28,7 +28,7 @@ services:
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
         - traefik.http.routers.portainer.middlewares=authelia@docker
-        - traefik.https.routers.portainer.rule=Host(`${PORTAINER_DOMAIN}`)
+        - traefik.https.routers.portainer.rule=Host(`portainer.${ROOT_DOMAIN}`)
         - traefik.http.routers.portainer.entrypoints=https
         - traefik.http.routers.portainer.tls=true
         - traefik.http.routers.portainer.tls.certresolver=le
