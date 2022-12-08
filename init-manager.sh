@@ -55,6 +55,7 @@ docker secret create oidc_hmac_secret deployment/secrets/oidc_hmac_secret
 # Generate OIDC_ISSUER_PRIVATE_KEY
 openssl genrsa -out deployment/secrets/oidc_issuer_private_key 4096
 docker secret create oidc_issuer_private_key deployment/secrets/oidc_issuer_private_key
+
 # Generate portainer client secret
 PORTAINER_CLIENT_SECRET=$(openssl rand -hex 32)
 
