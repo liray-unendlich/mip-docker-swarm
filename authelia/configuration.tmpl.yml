@@ -123,7 +123,7 @@ notifier:
     password: ${SMTP_PASSWORD}
     host: ${SMTP_HOST}
     port: ${SMTP_PORT}
-    sender: ${AUTHELIA_EMAIL}
+    sender: ${SMTP_SENDER_EMAIL}
 
 identity_providers:
   oidc:
