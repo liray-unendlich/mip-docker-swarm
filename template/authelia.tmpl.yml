@@ -2,11 +2,12 @@ version: "3.3"
 
 services:
   authelia:
-    image: authelia/authelia:latest
+    image: authelia/authelia:4.37.2
     user: $USER_ID:$GROUP_ID
     networks:
       - traefik-public
       - monitor
+      - default
     volumes:
       - ../data/authelia/config:/config
     environment:
@@ -18,17 +19,17 @@ services:
       AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE: /secrets/OIDC_ISSUER_PRIVATE_KEY
     secrets:
       - source: jwt_secret
-        target: /secret/JWT_SECRET
+        target: /secrets/JWT_SECRET
       - source: session_secret
-        target: /secret/SESSION_SECRET
+        target: /secrets/SESSION_SECRET
       - source: storage_postgres_password
-        target: /secret/STORAGE_POSTGRES_PASSWORD
+        target: /secrets/STORAGE_POSTGRES_PASSWORD
       - source: storage_encryption_key
-        target: /secret/STORAGE_ENCRYPTION_KEY
+        target: /secrets/STORAGE_ENCRYPTION_KEY
       - source: oidc_hmac_secret
-        target: /secret/OIDC_HMAC_SECRET
+        target: /secrets/OIDC_HMAC_SECRET
       - source: oidc_issuer_private_key
-        target: /secret/OIDC_ISSUER_PRIVATE_KEY
+        target: /secrets/OIDC_ISSUER_PRIVATE_KEY
     deploy:
       placement:
         constraints:
@@ -68,15 +69,15 @@ services:
       - "-cshared_preload_libraries=pg_stat_statements"
     environment:
       PGDATA: /var/lib/postgresql/data
-      POSTGRES_DB: "authelia"
-      POSTGRES_USER: "authelia"
+      POSTGRES_DB: authelia
+      POSTGRES_USER: authelia
       POSTGRES_PASSWORD_FILE: /secrets/STORAGE_POSTGRES_PASSWORD
       TZ: Asia/Tokyo
     volumes:
       - ../data/authelia/postgres:/var/lib/postgresql/data
     secrets:
       - source: storage_postgres_password
-        target: /secret/STORAGE_POSTGRES_PASSWORD
+        target: /secrets/STORAGE_POSTGRES_PASSWORD
     # Swarm
     deploy:
       replicas: 1

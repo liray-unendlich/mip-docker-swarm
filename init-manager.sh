@@ -4,7 +4,7 @@ echo -n "Please enter your sudo password:"
 read PERMISSION_PASSWORD
 
 echo "Setting up directories under data/: for prometheus/grafana/postgres/authelia"
-mkdir -p data/postgres data/authelia/postgres data/authelia/config
+mkdir -p data/postgres data/authelia/postgres data/authelia/config data/authelia/redis
 mkdir -p deployment
 mkdir -p data/prometheus data/grafana
 

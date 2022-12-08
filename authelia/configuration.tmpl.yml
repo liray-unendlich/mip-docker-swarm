@@ -45,7 +45,7 @@ duo_api:
 ## This is used to validate the servers time is accurate enough to validate TOTP.
 ntp:
   ## NTP server address.
-  address: "ntp.nict.jp"
+  address: "pool.ntp.org:123"
   ## NTP version
   version: 4
   ## Maximum allowed time offset between the host and the NTP server.
