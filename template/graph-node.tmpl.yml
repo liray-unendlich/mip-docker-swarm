@@ -48,8 +48,8 @@ services:
       GRAPH_KILL_IF_UNRESPONSIVE: "true"
       RUST_LOG: INFO
       GRAPH_LOG: INFO
-      GRAPH_NODE_ID: "index_node__0"
-      NODE_ID: "index_node__0"
+      GRAPH_NODE_ID: "index_node_0"
+      NODE_ID: "index_node_0"
       node_role: "index-node"
       STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
       ETHEREUM_TRACE_STREAM_STEP_SIZE: ${ETHEREUM_TRACE_STREAM_STEP_SIZE:-50}
@@ -87,8 +87,8 @@ services:
       GRAPH_KILL_IF_UNRESPONSIVE: "true"
       RUST_LOG: INFO
       GRAPH_LOG: INFO
-      GRAPH_NODE_ID: "index_node__1"
-      NODE_ID: "index_node__1"
+      GRAPH_NODE_ID: "index_node_1"
+      NODE_ID: "index_node_1"
       node_role: "index-node"
       STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
       ETHEREUM_TRACE_STREAM_STEP_SIZE: ${ETHEREUM_TRACE_STREAM_STEP_SIZE:-50}
