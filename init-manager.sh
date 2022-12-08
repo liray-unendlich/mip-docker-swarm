@@ -38,19 +38,19 @@ echo "Generating authelia secret files and deploying on docker swarm network"
 # Set up temporaly folder 'secrets' in deployment/
 mkdir deployment/secrets
 # Generate JWT_SECRET
-openssl rand -hex 64 > deployment/secrets/jwt_secret
+openssl rand -hex 32 > deployment/secrets/jwt_secret
 docker secret create jwt_secret deployment/secrets/jwt_secret
 # Generate SESSION_SECRET
-openssl rand -hex 64 > deployment/secrets/session_secret
+openssl rand -hex 32 > deployment/secrets/session_secret
 docker secret create session_secret deployment/secrets/session_secret
 # Generate STORAGE_POSTGRES_PASSWORD
-openssl rand -hex 64 > deployment/secrets/storage_postgres_password
+openssl rand -hex 32 > deployment/secrets/storage_postgres_password
 docker secret create storage_postgres_password deployment/secrets/storage_postgres_password
 # Generate STORAGE_ENCRYPTION_KEY
-openssl rand -hex 64 > deployment/secrets/storage_encryption_key
+openssl rand -hex 32 > deployment/secrets/storage_encryption_key
 docker secret create storage_encryption_key deployment/secrets/storage_encryption_key
 # Generate OIDC_HMAC_SECRET
-openssl rand -hex 64 > deployment/secrets/oidc_hmac_secret
+openssl rand -hex 32 > deployment/secrets/oidc_hmac_secret
 docker secret create oidc_hmac_secret deployment/secrets/oidc_hmac_secret
 # Generate OIDC_ISSUER_PRIVATE_KEY
 openssl genrsa -out deployment/secrets/oidc_issuer_private_key 4096
