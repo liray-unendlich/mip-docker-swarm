@@ -56,13 +56,13 @@ docker secret create oidc_hmac_secret deployment/secrets/oidc_hmac_secret
 openssl genrsa -out deployment/secrets/oidc_issuer_private_key 4096
 docker secret create oidc_issuer_private_key deployment/secrets/oidc_issuer_private_key
 # Generate portainer client secret
-PORTAINER_CLIENT_SECRET=$(openssl rand -hex 64)
+PORTAINER_CLIENT_SECRET=$(openssl rand -hex 32)
 
 # Delete secrets/*
 rm -r deployment/secrets
 
 # Generate configuration.yml
-set -o allexport; source .env; PORTAINER_CLIENT_SECRET=${PORTAINER_CLIENT_SECRET}; set +o allexport; envsubst < ./authelia/configuration.tmpl.yml > data/authelia/config/configuration.yml
+set -o allexport; source .env; PORTAINER_CLIENT_SECRET="\$plaintext\$"${PORTAINER_CLIENT_SECRET}; set +o allexport; envsubst < ./authelia/configuration.tmpl.yml > data/authelia/config/configuration.yml
 
 # Generate password hash and set up users_database.yml
 TEMP_HASHED_PASSWORD=$(docker run authelia/authelia:latest authelia crypto hash generate argon2 --password ${AUTHELIA_PASSWORD})
@@ -80,7 +80,7 @@ docker stack deploy -c deployment/monitor.yml monitor
 
 # Generate and show portainer's oauth client secret
 echo -n "Please copy below secret string for editing your oauth configuration in portainer:"
-echo $PORTAINER_CLIENT_SECRET
+echo ${PORTAINER_CLIENT_SECRET:\$plaintext\$}
 
 echo "If you forget portainer's client secret, use this command: cat data/authelia/config/configuration.yml and check bottom section"
 
