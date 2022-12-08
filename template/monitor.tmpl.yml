@@ -97,7 +97,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.hostname == indexer-manager
+          - node.role == manager
       labels:
         - traefik.enable=false
     networks:
