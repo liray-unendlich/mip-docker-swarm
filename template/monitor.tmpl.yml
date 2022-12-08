@@ -38,7 +38,7 @@ services:
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
         - traefik.http.routers.prometheus.middlewares=authelia@docker
-        - traefik.https.routers.prometheus.rule=Host(`prometheus.${ROOT_DOMAIN}`)
+        - traefik.http.routers.prometheus.rule=Host(`prometheus.${ROOT_DOMAIN}`)
         - traefik.http.routers.prometheus.entrypoints=https
         - traefik.http.routers.prometheus.tls=true
         - traefik.http.routers.prometheus.tls.certresolver=le
@@ -78,7 +78,7 @@ services:
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
         - traefik.http.routers.grafana.middlewares=authelia@docker
-        - traefik.https.routers.grafana.rule=Host(`grafana.${ROOT_DOMAIN}`)
+        - traefik.http.routers.grafana.rule=Host(`grafana.${ROOT_DOMAIN}`)
         - traefik.http.routers.grafana.entrypoints=https
         - traefik.http.routers.grafana.tls=true
         - traefik.http.routers.grafana.tls.certresolver=le
