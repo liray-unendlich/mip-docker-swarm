@@ -80,7 +80,7 @@ docker stack deploy -c deployment/monitor.yml monitor
 
 # Generate and show portainer's oauth client secret
 echo -n "Please copy below secret string for editing your oauth configuration in portainer:"
-echo ${PORTAINER_CLIENT_SECRET:\$plaintext\$}
+echo ${PORTAINER_CLIENT_SECRET:11:64}
 
 echo "If you forget portainer's client secret, use this command: cat data/authelia/config/configuration.yml and check bottom section"
 
