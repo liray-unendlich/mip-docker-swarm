@@ -42,14 +42,14 @@ services:
   index-node-0:
     image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
     environment:
-      BLOCK_INGESTOR: index_node_${CHAIN_NAME}_0
+      BLOCK_INGESTOR: index_node__0
       GRAPH_NODE_CONFIG: /var/config/config.toml
       ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
       GRAPH_KILL_IF_UNRESPONSIVE: "true"
       RUST_LOG: INFO
       GRAPH_LOG: INFO
-      GRAPH_NODE_ID: "index_node_${CHAIN_NAME}_0"
-      NODE_ID: "index_node_${CHAIN_NAME}_0"
+      GRAPH_NODE_ID: "index_node__0"
+      NODE_ID: "index_node__0"
       node_role: "index-node"
       STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
       ETHEREUM_TRACE_STREAM_STEP_SIZE: ${ETHEREUM_TRACE_STREAM_STEP_SIZE:-50}
@@ -87,8 +87,8 @@ services:
       GRAPH_KILL_IF_UNRESPONSIVE: "true"
       RUST_LOG: INFO
       GRAPH_LOG: INFO
-      GRAPH_NODE_ID: "index_node_${CHAIN_NAME}_1"
-      NODE_ID: "index_node_${CHAIN_NAME}_1"
+      GRAPH_NODE_ID: "index_node__1"
+      NODE_ID: "index_node__1"
       node_role: "index-node"
       STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
       ETHEREUM_TRACE_STREAM_STEP_SIZE: ${ETHEREUM_TRACE_STREAM_STEP_SIZE:-50}
@@ -125,8 +125,8 @@ services:
       ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
       RUST_LOG: INFO
       GRAPH_LOG: INFO
-      GRAPH_NODE_ID: "query_node_${CHAIN_NAME}"
-      NODE_ID: "query_node_${CHAIN_NAME}"
+      GRAPH_NODE_ID: "query_node"
+      NODE_ID: "query_node"
       node_role: "query-node"
       GRAPH_ETH_CALL_GAS: 50000000
       GRAPH_GETH_ETH_CALL_ERRORS: "out of gas"
