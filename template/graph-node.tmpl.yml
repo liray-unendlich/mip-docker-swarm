@@ -42,7 +42,7 @@ services:
   index-node-0:
     image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
     environment:
-      BLOCK_INGESTOR: index_node__0
+      BLOCK_INGESTOR: index_node_0
       GRAPH_NODE_CONFIG: /var/config/config.toml
       ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
       GRAPH_KILL_IF_UNRESPONSIVE: "true"
