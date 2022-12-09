@@ -71,6 +71,8 @@ access_control:
     - domain:
         [
           "portainer.${ROOT_DOMAIN}",
+          "portal.${ROOT_DOMAIN}",
+          "swarmpit.${ROOT_DOMAIN}",
           "traefik.${ROOT_DOMAIN}",
           "prometheus.${ROOT_DOMAIN}",
           "grafana.${ROOT_DOMAIN}",

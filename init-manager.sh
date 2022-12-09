@@ -3,8 +3,8 @@ echo "Starting initialization script of your indexer. Our setup procedure includ
 echo -n "Please enter your sudo password:"
 read PERMISSION_PASSWORD
 
-echo "Setting up directories under data/: for prometheus/grafana/postgres/authelia"
-mkdir -p data/postgres data/authelia/postgres data/authelia/config data/authelia/redis
+echo "Setting up directories under data/: for prometheus/grafana/postgres/authelia/swarmpit"
+mkdir -p data/postgres data/authelia/postgres data/authelia/config data/authelia/redis data/swarmpit/db-data data/swarmpit/influx-data
 mkdir -p deployment
 mkdir -p data/prometheus data/grafana
 
@@ -24,6 +24,7 @@ docker network create --driver=overlay monitor
 echo "Generating docker swarm configuration files(deployment/*.yml)"
 NODE_ID=$(docker info -f '{{.Swarm.NodeID}}')
 docker node update --label-add traefik-public.traefik-public-certificates=true $NODE_ID
+
 source .env
 
 docker config create prometheus-$(date +"%Y%m%d") prometheus/prometheus.yml
