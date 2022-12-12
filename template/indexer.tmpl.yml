@@ -116,6 +116,7 @@ services:
 networks:
   default:
     name: indexer_default
+    external: true
   monitor:
     external: true
   traefik-public:
