@@ -54,6 +54,7 @@ sleep 15s
 docker exec -it $(docker ps | grep postgres | cut -c 1-12) PGPASSWORD=${DB_PASS} psql -U ${DB_USER} -d ${DB_NAME} -c "CREATE DATABASE indexer;"
 
 echo "Deploying/updating indexer stack"
+set -o allexport; source .env; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml
 docker stack deploy -c deployment/indexer.yml indexer
 
 # Wait 15 seconds and try to connect indexer-agent
