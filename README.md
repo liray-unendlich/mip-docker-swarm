@@ -5,29 +5,30 @@ MIPテストネットへの対応として、チェーンごとの別サーバ�
 構造は画像のとおり。
 ![thegraph-mip-pic01](https://user-images.githubusercontent.com/15893314/193045327-07b08c45-a31e-4640-a26a-a95fe28f9a4c.png)
 
-今回の構成では、Contabo Cloud VPS XLをチェーン数分＋マネージャーノード1台を借りて構成を作ることにしました（私は、ということなので皆さんはnotionから見て大丈夫な性能で十分です）。
-最初のブランチphase0では、必要となるインデックスノード、クエリノードのみをホストします。
-また、ネットワーク処理としてtraefikを、docker swarmのWebUIとしてswarmpitをインストールしています。
+今回の構成では、1台のVPSサーバーに上の構造を全て埋め込むことにしました。ロードバランサーとしてtraefikを、docker swarmのWebUIとしてportainerをインストールしています。また、管理サービスへのログインをSSO化するため、autheliaを認証サービサーとして使用しています。
 
 手続きは、以下のとおりです。
-1. VPSを契約する（最低2台）
-1. ENS(goerli), ドメインを取得する
-1. VPSの初期設定をする（https://ayame.space/2021/03/ubuntu-20-04-initialize/ のDocker環境の構築直前までぐらいやれば十分）
-1. dockerをインストールする
-1. githubレポをクローンする
-1. スクリプトをいくらか動かして設定をする
-1. 動くか確認する
+1. VPSを契約する
+2. ENS(goerli), ドメインを取得する
+3. VPSの初期設定をする（https://ayame.space/2021/03/ubuntu-20-04-initialize/ のDocker環境の構築直前までぐらいやれば十分）
+4. SMTPを設定する
+5. dockerをインストールする
+6. githubレポをクローンする
+7. .envを編集する
+8. スクリプトで設定をする
+9. 動くか確認する
 
 ここでは、最初の1~3を省略し、4からやっていきます。
 2についてのみ、注意点があります。
 ドメイン紐付けは、次のように行なってください。
 | サービス名 | ドメイン | 割当IP |
 | :----------------------------: | :----------------------------: | :----------------------------: |
-| traefik | traefik.sld.tld | サーバー（マネージャー）のIP |
-| swarmpit | swarmpit.sld.tld | サーバー（マネージャー）のIP |
-| prometheus | prometheus.sld.tld | サーバー（マネージャー）のIP |
-| grafana | grafana.sld.tld | サーバー（マネージャー）のIP |
-| query | query.sld.tld | サーバー（マネージャー）のIP |
+| traefik | traefik.sld.tld | サーバーのIP |
+| authelia | authelia.sld.tld | サーバーのIP |
+| portainer | portainer.sld.tld | サーバーのIP |
+| prometheus | prometheus.sld.tld | サーバーのIP |
+| grafana | grafana.sld.tld | サーバーのIP |
+| indexer | indexer.sld.tld | サーバーのIP |
 
 ## 4. dockerをインストールする
 dockerは、次の手続きでインストールしましょう。ここから、*サーバーごとに実施することを明記したコマンドを除き、使用するサーバー全て*で同じことを行ってください。
@@ -48,6 +49,7 @@ sudo service docker restart
 sudo apt-get install -y git
 git clone https://github.com/liray-unendlich/mip-docker-swarm.git
 cd mip-docker-swarm
+git checkout mainnet
 cp example.env .env
 ```
 ここまでで、コードのダウンロードが完了しました。
@@ -55,94 +57,81 @@ cp example.env .env
 example.env自体に、envがそれぞれどのような意味か記載しています。
 
 ## 6. スクリプトを動かして設定する
-それでは、スクリプトを使って、サーバーごとの初期設定（docker swarmの設定用）を行いましょう。
-まず、次のコマンドを、_サーバー（マネージャー）_ に対して実施します。
+それでは、スクリプトを使って、サーバーの初期設定（docker swarmの設定用）を行いましょう。
+まず、次のコマンドを、_サーバー_ 上で実施します。
 ```
-chmod +x init-phase0-manager.sh
-bash init-phase0-manager.sh
+chmod +x init-manager.sh
+bash init-manager.sh
 ```
 スクリプト実行時、管理者パスワードの入力が必要となります。また、最後には他サーバーが同じクラスターに入るためのトークンが出力されるので、メモしましょう(このトークンは、`docker swarm join-token worker`によって再表示できます）。
 
-このスクリプトによって、docker swarmのクラスターが生成され、traefik/swarmpit/prometheus/grafanaをインストールしました。
+このスクリプトによって、docker swarmのクラスターが生成され、traefik/portainer/authelia/prometheus/grafanaがインストールされました。実際に、SSO及びその他の動作が適切に動いているか、確認しましょう。
+1. authelia.sld.tld にアクセスする
+   authelia.sld.tldにアクセスすると、ログイン画面が表示されます。この時、.envに入力したアカウントのID/パスワードでログインしてください。すると、次に2段階認証の設定を求められますので、お好みの方法で設定してください。
+2. portainer.sld.tld にアクセスする
+   最初は、adminアカウントの生成が必要になります。その後で、https://www.authelia.com/integration/openid-connect/portainer/ を確認し、SSO設定が必要になります。
+3. grafana/prometheus.sld.tld にアクセスする
+   portainerにSSOでアクセスできるようになったら、grafana/prometheusにアクセスしましょう。autheliaの設定が正常に行われていれば、認証を行ったブラウザでのみ接続できるはずです。
 
-次に、サーバー（各チェーン用）の初期設定を実施しましょう。以下のコマンドを _サーバー（各チェーン用）_ で実行してください。※サーバー（各チェーン用）で、3~5を実施した後に実施してください。
-```
-chmod +x init-phase0-worker.sh
-bash init-phase0-worker.sh
-```
-このスクリプトでは、
-- 同期するチェーン（ホスト名に使用します）
-- クラスター追加トークン（上のサーバー（マネージャー）スクリプトの終了時に表示されたトークン）
-- マネージャーサーバーのIP:2377
-を入力する必要があります。
-
-ここまでで、最低二つのサーバーが同じクラスター上に統合されました。実際に、統合されていることを確認するため、Web UI(Swarmpit)を確認しましょう。
-
-env(##5)で設定した"swarmpit.sld.tld"に接続してみましょう。すると、最初にアカウント設定を要求された後、ログインできるようになるはずです。ここでは、複数のサーバーにまたがって同じクラスターのサーバーの処理状況やプロセス状況を確認することが出来ます（下に例画像を張り付けています）。後で初期設定をする、インデックスサーバーの設定のログや、様々な設定をWebUIから変更できます。
+portainerでは、複数のサーバーにまたがって同じクラスターのサーバーの処理状況やプロセス状況を確認することが出来ます（下に例画像を張り付けています）。後で初期設定をする、インデックスサーバーの設定のログや、様々な設定をWebUIから変更できます。
 ![image](https://user-images.githubusercontent.com/15893314/193424568-f43cead3-bdb2-44ff-bb1c-85151d7a7c2e.png)
 
-次に、実際にphase0を完了するため、インデックスサーバーのインストールを行います。
+次に、インデックスサーバーのインストールを行います。
 
-## 7. phase0のためのインデックスサーバーを設定する
-次のコマンドを、サーバー（マネージャー）上で実施してください。
+## 7. インデックスサーバーを設定する
+次のコマンドを、サーバー上で実施してください。
 ```
-chmod +x add-phase0-worker.sh
-bash add-phase0-worker.sh
+cp graph-node-config/config.tmpl /graph-node-config/config.toml
 ```
-このスクリプトでは、
-- インデックスするチェーン名（6で設定したサーバーと同じ。例えばgnosis）
-- チェーンのRPC（アーカイブノードが必要）のURL
-を入力する必要があります。このスクリプトが完了すると、6で確認したswarmpitで、インデックスサービスの状態を見ることが出来るはずです。
+これを実施した後に、[こちら](#複数のRPC APIを使って接続したい) を見ていただき、config.tomlを修正してください。
+
+その後、次のコマンドをサーバー上で実施して、インデクサーサービスを起動させます。
+```
+chmod +x update-indexer.sh
+bash update-indexer.sh
+```
+このスクリプトが完了すると、6で確認したportainerで、インデックスサービスの状態を見ることが出来るはずです。
 ![image](https://user-images.githubusercontent.com/15893314/193424539-076714c2-8dfb-4078-9cc7-2d6d60f4aa78.png)
 
 ## 8. 使い方に慣れる
 今回、以下のdocker stackを生成・運用しています。
-- Swarmpit(docker swarmのWebUI. このスクリプトでは、configをdocker swarmの機能を使用してアップロードしているので、原理的には、docker swarmにサーバーを入れた後は、全てSwarmpit上からこれからは設定が出来るようになります。ただし、phase0で要求されているcurlコマンドはVPS上でしか出来ないようにしています（セキュリティを考慮しています）)
-- Traefik(URLのハンドリングをしてくれています。SSL証明書等の発行もまとめてやってくれます。basicauthもやっています)
-- Prometheus(index-node, query-nodeや、それぞれのノードのnode-exporterから情報を受け取り、蓄積しています)
+- Authelia(SSOの認証サービサー. Portainer/Traefik/Prometheus/Grafanaに対して、SSOを通して認証を行います。indexerのみ、対象から除外です)
+- Portainer(docker swarmのWebUI. このスクリプトでは、configをdocker swarmの機能を使用してアップロードしているので、原理的には、docker swarmにサーバーを入れた後は、全てPortainer上から設定が出来るようになります。)
+- Traefik(URLのハンドリングをしてくれています。SSL証明書等の発行もまとめてやってくれます。)
+- Prometheus(index-node, query-nodeや、node-exporterから情報を受け取り、蓄積しています)
 - Grafana(prometheusから受け取った情報や、postgreSQLから取り出したデータを可視化します)
 - postgreSQL
-- index-node(graph-nodeの役割がインデックスのもの。)
+- Indexer(クエリの提供、インデックスを実行します)
 
-実際にいろんな画面（特にSwarmpitとGrafana）を見てみてください。
+実際にいろんな画面（特にPortainerとGrafana）を見てみてください。
 
-## 9. phase0のミッションを確認する
-phase0では、次のミッションがあります。
-- prometheusにbasicauthを実装する
-- prometheusのSSLエンドポイントを提供する
-- query-nodeのSSLエンドポイントを提供する
-- gnosis chain上で、複数のサブグラフをインデックスする
-https://thegraphfoundation.notion.site/The-Graph-MIPs-Phase-0-Indexer-Setup-f411f375f2ab4d6bbb9df55481cb3bec <br>
-をご確認ください。
-
-このうち、prometheusのbasicauth実装/prometheusのSSLエンドポイント/query-nodeのSSLエンドポイントは既に完了しています。(.envに記載されているそれぞれのユーザー名・パスワードが該当する情報です)そのため、最後のgnosis chain上でのサブグラフインデックスのみ、実施していきましょう。
-
-サブグラフのインデックスは、サーバー（gnosis）上で次のコマンドを実施することで行うことが出来ます。
-```
-docker exec -it $(docker ps | grep index-node | cut -c 1-12) bash
-apt install -y curl
-```
-```
-curl --location --request POST 'http://localhost:8020' --header 'Content-Type: application/json' --data-raw '{"method":"subgraph_create","jsonrpc":"2.0","params":{"name":"*Subgraph Name*"},"id":""}'
-```
-```
-curl --location --request POST 'http://localhost:8020' --header 'Content-Type: application/json' --data-raw '{"method":"subgraph_deploy","jsonrpc":"2.0","params":{"name":"*Subgraph Name*","ipfs_hash":"*IPFS Hash*"},"id":""}'
-```
-この時、*Subgraph Name*, *IPFS Hash* は下の表からそれぞれ入力ください。
-
-| Subgraph Name | IPFS Hash |
-| --- | --- |
-| Sushiswap-Gnosis | QmW8Cbb2R4ZHWGsrYjNJKRjoKKcPeDTNK6rdipfQQaAhd6 |
-| Connext-NXTPv1-Gnosis | QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe |
-| 1Hive-GardenGC | QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX |
-| Giveth-Economy-Gnosis | QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq |
-
-同期が完了するタイミングは、Grafanaのdashboardである、"Indexing Status Overview" で確認してください。
-
-同期が進んでおり、
-query.sld.tld/subgraphs/name/1Hive-GardenGC/graphql
-への接続が出来れば（GraphQLのページが表示されればOK）問題なく設定が出来ています。ここまで完了したら、フォームでエンドポイントを提出しましょう！
-![image](https://user-images.githubusercontent.com/15893314/193424512-aae48349-a3e3-4b1b-9e0f-cbd044be63de.png)
+## 9. GRTを割り当てる
+今の設定では、portainer上で、indexer-cliのbashを実行することで、ブラウザ上からインデクサーのインデックス処理、クエリ処理等の設定が出来るようになっています。
+indexer-cli上で、次のコマンドで、次のことが出来ます。説明は面倒（というか自分も完全には理解できていない）なので [ドキュメント](https://thegraph.com/docs/en/network/indexing/#indexer-management-using-indexer-cli) を見てください。
+- graph indexer status                     indexerのステータスチェック
+- graph indexer rules stop (never)         Never index a deployment (and stop indexing it if necessary)
+- graph indexer rules start (always)       Always index a deployment (and start indexing it if necessary)
+- graph indexer rules set                  Set one or more indexing rules
+- graph indexer rules prepare (offchain)   Offchain index a deployment (and start indexing it if necessary)
+- graph indexer rules maybe                Index a deployment based on rules
+- graph indexer rules get                  Get one or more indexing rules
+- graph indexer rules delete               Remove one or many indexing rules
+- graph indexer rules clear (reset)        Clear one or more indexing rules
+- graph indexer cost set variables         Update cost model variables
+- graph indexer cost set model             Update a cost model
+- graph indexer cost get                   Get cost models and/or variables for one or all subgraphs
+- graph indexer connect                    Connect to indexer management API
+- graph indexer allocations reallocate     Reallocate to subgraph deployment
+- graph indexer allocations get            List one or more allocations
+- graph indexer allocations create         Create an allocation
+- graph indexer allocations close          Close an allocation
+- graph indexer allocations                Manage indexer allocations
+- graph indexer actions queue              Queue an action item
+- graph indexer actions get                List one or more actions
+- graph indexer actions execute            Execute approved items in the action queue
+- graph indexer actions delete             Delete an item in the queue
+- graph indexer actions cancel             Cancel an item in the queue
+- graph indexer actions approve            Approve an action item
 
 ## 10. もっとカスタムしたい人
 もっとカスタムしたい人向けに、簡単なメモを入れておきます。
@@ -156,6 +145,13 @@ connection = "postgresql://DBのユーザー名:DBのパスワード@postgres:54
 pool_size = 10
 [chains]
 ingestor = "index_node_gnosis"
+# Ethereum Mainnetの設定
+[chains.mainnet]
+shard = "primary"
+provider = [
+             { label = "mainnet", url = "CHAINSTACKのURL", features = ["archive", "traces"] }
+           ]
+# Gnosis Mainnetの設定
 [chains.gnosis]
 shard = "primary"
 provider = [
