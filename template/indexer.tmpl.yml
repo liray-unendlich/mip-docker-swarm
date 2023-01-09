@@ -85,13 +85,10 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
-        - "traefik.http.routers.indexer-service-http.rule=Host(`indexer.${ROOT_DOMAIN}`)"
-        - traefik.http.routers.indexer-service-http.entrypoints=http
-        - traefik.http.routers.indexer-service-http.middlewares=https-redirect
-        - "traefik.http.routers.indexer-service-https.rule=Host(`indexer.${ROOT_DOMAIN}`)"
-        - traefik.http.routers.indexer-service-https.entrypoints=https
-        - traefik.http.routers.indexer-service-https.tls=true
-        - traefik.http.routers.indexer-service-https.tls.certresolver=le
+        - traefik.http.routers.indexer-service.rule=Host(`indexer.${ROOT_DOMAIN}`)
+        - traefik.http.routers.indexer-service.entrypoints=https
+        - traefik.http.routers.indexer-service.tls=true
+        - traefik.http.routers.indexer-service.tls.certresolver=le
         - traefik.http.services.indexer-service.loadbalancer.server.port=7600
 
   ############################################################################
