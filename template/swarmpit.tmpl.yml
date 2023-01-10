@@ -26,7 +26,7 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
-        - traefik.http.routers.swarmpit.rule=Host(`${SWARMPIT_DOMAIN}`)
+        - traefik.http.routers.swarmpit.rule=Host(`swarmpit.${ROOT_DOMAIN}`)
         - traefik.http.routers.swarmpit.entrypoints=https
         - traefik.http.routers.swarmpit.tls=true
         - traefik.http.routers.swarmpit.tls.certresolver=le
