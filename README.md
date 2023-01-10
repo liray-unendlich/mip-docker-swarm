@@ -1,24 +1,20 @@
 # mip-docker-swarm
 
-MIP テストネットへの対応として、チェーンごとの別サーバー化が必要なので、全ノードをうまーく統合管理できるよう、docker swarm を活用することにしました
-(最初は kubernetes でやろうとしたけどまだ慣れているこっちから作ることにしました）。
-
-構造は画像のとおり。
+MIP テストネットへの対応として、サーバーに以下の構造のサービスを稼働させ、クエリサービスを様々なチェーンで提供しましょう。
 ![mip-powerpoint](https://user-images.githubusercontent.com/15893314/196847508-ed85f067-45ba-4881-a333-7f25209154ad.png)
 
-
-今回の構成では、Contabo Cloud VPS XL をチェーン数分＋マネージャーノード 1 台を借りて構成を作ることにしました（私は、ということなので皆さんは notion から見て大丈夫な性能で十分です）。
-最初のブランチ phase0 では、必要となるインデックスノード、クエリノードのみをホストします。
-また、ネットワーク処理として traefik を、docker swarm の WebUI として swarmpit をインストールしています。
+今回の構成では、Contabo Cloud VPS XL 1 台を借りて構成を作ることにしました（チェーン数が増えれば増えるほど、負荷が厳しくなる可能性があります。その場合、適宜サーバー数を増やします）。
+既に、Gnosisチェーンではメインネットでのクエリ提供が開始されています。このブランチでは、あくまでテストネット用のサービス提供体制とします（管理がややこしいんですが、しょうがないです）。
+また、ロードバランサーとして traefik を、docker swarm の WebUI として swarmpit/portainer をインストールします。
 
 手続きは、以下のとおりです。
 
-1. VPS を契約する（最低 2 台）
-1. ENS(goerli), ドメインを取得する
+1. VPS を契約する
+1. ENS(goerli), ドメイン(gunu-node.comみたいなやつ)を取得する
 1. VPS の初期設定をする（https://ayame.space/2021/03/ubuntu-20-04-initialize/ の Docker 環境の構築直前までぐらいやれば十分）
 1. docker をインストールする
 1. github レポをクローンする
-1. スクリプトをいくらか動かして設定をする
+1. 以下のドキュメントに従い設定する
 1. 動くか確認する
 
 ここでは、最初の 1~3 を省略し、4 からやっていきます。
@@ -28,28 +24,27 @@ MIP テストネットへの対応として、チェーンごとの別サーバ�
 | :----------------------------: | :----------------------------: | :----------------------------: |
 | traefik | traefik.sld.tld | サーバー（マネージャー）の IP |
 | swarmpit | swarmpit.sld.tld | サーバー（マネージャー）の IP |
+| portainer | swarmpit.sld.tld | サーバー（マネージャー）の IP |
 | prometheus | prometheus.sld.tld | サーバー（マネージャー）の IP |
 | grafana | grafana.sld.tld | サーバー（マネージャー）の IP |
 | indexer | indexer.sld.tld | サーバー（マネージャー）の IP |
-| console | console.sld.tld | サーバー（マネージャー）の IP |
 
 ## 4. docker をインストールする
 
-docker は、次の手続きでインストールしましょう。ここから、*サーバーごとに実施することを明記したコマンドを除き、使用するサーバー全て*で同じことを行ってください。
+docker は、次のコマンドをサーバー上で実行して、インストールしましょう。
 
 ```
 curl -fsSL https://get.docker.com/ | sh
 ```
 
-この後、
+次に、
 
 ```
 sudo usermod -aG docker [ユーザー名]
 sudo service docker restart
 ```
 
-を実施し、ターミナルを開きなおしましょう。
-これにより、非 root ユーザーでも docker を使用できます。
+を実施し、ターミナルを開きなおしましょう。これにより、非 root ユーザーでも docker を使用できるようになりました。
 
 ## 5. github レポをクローンする
 
@@ -59,7 +54,7 @@ sudo service docker restart
 sudo apt-get install -y git
 git clone https://github.com/liray-unendlich/mip-docker-swarm.git
 cd mip-docker-swarm
-git checkout phase1
+git checkout testnet
 cp example.env .env
 ```
 
@@ -67,88 +62,44 @@ cp example.env .env
 最後の行で、example.env を.env としてコピーしましたので、.env を自分用の設定に変更しましょう。
 example.env 自体に、env がそれぞれどのような意味か記載しています。
 
-## 6. スクリプトを動かして設定する(Phase0 やってない人はここから！)
+## 6. スクリプトを動かして設定
 
 それでは、スクリプトを使って、サーバーごとの初期設定（docker swarm の設定用）を行いましょう。
-まず、次のコマンドを、_サーバー（マネージャー）_ に対して実施します。
+まず、次のコマンドを、_サーバー_ 上で実施します。
 
 ```
 chmod +x init-manager.sh
 bash init-manager.sh
 ```
 
-スクリプト実行時、管理者パスワードの入力が必要となります。また、最後には他サーバーが同じクラスターに入るためのトークンが出力されるので、メモしましょう(このトークンは、`docker swarm join-token worker`によって再表示できます）。
+スクリプト実行時、管理者パスワードの入力が必要となります。このスクリプトによって、docker swarm のクラスターが生成され、traefik/swarmpit/portainer/prometheus/grafana をインストールしました。サーバーの動作が適切になされているかを確認するため、Web UI(Swarmpit/Portainer)を確認しましょう。
 
-このスクリプトによって、docker swarm のクラスターが生成され、traefik/swarmpit/prometheus/grafana をインストールしました。
-
-次に、サーバー（各チェーン用）の初期設定を実施しましょう。以下のコマンドを _サーバー（各チェーン用）_ で実行してください。※サーバー（各チェーン用）で、3~5 を実施した後に実施してください。
-
-```
-chmod +x init-worker.sh
-bash init-worker.sh
-```
-
-このスクリプトでは、
-
-- 同期するチェーン（ホスト名に使用します）
-- クラスター追加トークン（上のサーバー（マネージャー）スクリプトの終了時に表示されたトークン）
-- マネージャーサーバーの IP
-  を入力する必要があります。
-
-ここまでで、最低二つのサーバーが同じクラスター上に統合されました。実際に、統合されていることを確認するため、Web UI(Swarmpit)を確認しましょう。
-
-env(##5)で設定した"swarmpit.sld.tld"に接続してみましょう。すると、最初にアカウント設定を要求された後、ログインできるようになるはずです。ここでは、複数のサーバーにまたがって同じクラスターのサーバーの処理状況やプロセス状況を確認することが出来ます（下に例画像を張り付けています）。後で初期設定をする、インデックスサーバーの設定のログや、様々な設定を WebUI から変更できます。
+env(##5)で設定した"swarmpit.sld.tld/portainer.sld.tld"に接続してみましょう。すると、最初にアカウント設定を要求された後、ログインできるようになるはずです。ここでは、複数のサーバーにまたがって同じクラスターのサーバーの処理状況やプロセス状況を確認することが出来ます（下に例画像を張り付けています）。後で初期設定をする、インデックスサーバーの設定のログや、様々な設定を WebUI から変更できます。
 ![image](https://user-images.githubusercontent.com/15893314/193424568-f43cead3-bdb2-44ff-bb1c-85151d7a7c2e.png)
 
-## 7. phase1 の設定をする（Phase0 やった人はここから！）
-
-次に、実際に phase1 を完了するため、インデックスサーバーのインストールを行いましょう。以下のコマンドを _サーバー（マネージャー）_ で実施してください。
-
+## 7.インデクサーをgoerliテストネット上で稼働させる
+次に、必要なサービスとなる、以下4サービスを稼働させます。
+- インデックスノード（クエリノードが必要とするインデックス済みデータを提供する）
+- クエリノード（インデックスサービスにクエリデータを提供する）
+- インデクサーエージェント（Graph Networkと接続し、インデックスノードの管理を行う）
+- インデクサーサービス（Graph Networkと接続し、クエリ提供を行う）
+そのサービスを稼働させるために、次のコマンドをサーバー上で実行し、必要な設定ファイルの更新を始めましょう。
 ```
-git pull
-git checkout phase1
-chmod +x update-manager.sh phase1.sh
-bash update-manager.sh
-bash phase1.sh
+cp graph-node-config/config.tmpl graph-node-config/config.toml
+nano graph-node-config/config.toml
+```
+このコマンドにより、次の画像のような画面が表示されるはずです。このファイルは、インデックスノード及びクエリノードが、様々なチェーンで適切にデータを取得するための設定ファイルになっています。すなわち、どんなチェーンを、どのようなエンドポイントの組からデータ取得するかを定義しています。こちらから、設定方法をご覧ください（一例も載せています）。
+
+
+さて、config.tomlが適切に設定出来たら、サーバー上で、次のコマンドを一行ずつ実施します。
+```
+chmod +x update-indexer.sh
+bash update-indexer.sh
 ```
 
-phase1.sh の実行時、次の情報を入力する必要があります（.env に記載していれば不要です。一度 phase1.sh 実行時に入力すれば、.env に記載します）。それぞれの意味は、最下部に説明文を入れました。
+このコマンドが完了すれば、swarmpit/portainerから次の画像のように設定が出来ていることがわかるはずです。
 
-- goerli の フルノード RPC API URL アドレス(infuraとか)
-- インデクサーのアドレスとして使用する goerli ETH アドレス
-- 該当アドレスの mnemonic
-- インデクサーのサーバーの緯度、経度（（xx.xx yy.yy）の形式で入力してください）
-- インデクサーのドメイン
-- コンソールのドメイン（インデクサーを操作するためのコンソール。console.sld.tldで接続できます）
-- コンソールのユーザー名
-- コンソールのパスワード
-- 同期するチェーン名（gnosis と入力してください）
-
-最初の phase1.sh 実行時は 10 分~15 分程度の時間がかかります。
-完了すると、indexer-gnosis/indexer という stack が swarmpit に生成されます。また、grafana の dashboard が更新されているはず・・・です！
-
-このスクリプトが完了すると、6 で確認した swarmpit で、インデックスサービスの状態を見ることが出来るはずです。
-![image](https://user-images.githubusercontent.com/15893314/193424539-076714c2-8dfb-4078-9cc7-2d6d60f4aa78.png)
-これにて、phase1 の途中までが完了します。
-
-## 8. phase1 のミッションを確認する
-
-phase1 では、次のミッションがあります。
-
-- 新しい goerli ETH アドレスを作る（Mission1）
-- The Graph のテストネットインデクサーになる（Mission2）
-- インデクサーとしての活動を開始する（Mission3）
-
-https://thegraphfoundation.notion.site/Phase-1-Indexer-Account-Setup-Protocol-Interaction-eba1c9d696fe4f9ba0e11de441914f0e
-
-をご確認ください。
-
-**2022/11/03 現在、既にクエリ送出テストが開始されているようです。**
-
-### phase1 Mission1をクリアする（もう終わってます）
-
-### phase1 Mission2 をクリアする
-#### インデクサー登録する
+### Goerliテストネット上でインデクサーを登録する
 
 https://testnet.thegraph.com でインデクサーになるため、200kGRT をステーキングする必要があります。
 
@@ -157,7 +108,7 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 1. 右上のアバターをクリックする
 1. Indexing タブをクリックし、Stake ボタンを押す（この時、200kGRT をステーキング）
 
-これが完了すると、インデクサーとしての登録が完了します。※オペレーター設定はオプションなので、Mission 2 とは直接関係ありません。
+これが完了すると、インデクサーとしての登録が完了します。※オペレーター設定はオプションなので、テストネットの報酬とは直接関係ありません。
 
 #### オペレーターを設定する
 
@@ -170,17 +121,15 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 
 #### サブグラフへのアロケーション
 次に、サブグラフをインデックス開始するための手続きを説明します。
-コンソールのドメインを開き、入力したパスワードを使ってログインしましょう。
-1. コンソールにログインする
-2. imageがindexer-cliのものを選択し、container idをクリックする
-3. コンソールが開きます。次のコマンドを一行ずつ入力し、アロケーションを行いましょう。
+portainerより、stack > indexer > indexer-cli と移動し、コンソールを開きましょう。
+次のコマンドを一行ずつ入力し、アロケーションを行いましょう。
 ```
-graph indexer allocations create QmW8Cbb2R4ZHWGsrYjNJKRjoKKcPeDTNK6rdipfQQaAhd6 割当たい枚数 index_node_gnosis
-graph indexer allocations create QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe 割当たい枚数 index_node_gnosis
-graph indexer allocations create QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX 割当たい枚数 index_node_gnosis
-graph indexer allocations create QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq 割当たい枚数 index_node_gnosis
+graph indexer allocations create QmW8Cbb2R4ZHWGsrYjNJKRjoKKcPeDTNK6rdipfQQaAhd6 割当てたい枚数 index_node_0
+graph indexer allocations create QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe 割当てたい枚数 index_node_0
+graph indexer allocations create QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX 割当てたい枚数 index_node_0
+graph indexer allocations create QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq 割当てたい枚数 index_node_0
 ```
-このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaのダッシュボードで、を確認すると、インデックスが開始しているはずです。
+このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaのダッシュボードで確認すると、インデックスが開始しているはずです。
 
 ## 9. 使い方に慣れる
 
@@ -255,31 +204,20 @@ query = "query_node_*"
 
 ### envファイルの設定事項について
 envファイルの設定事項がどんどん増えてきたので、以下に内容を列記します
-| サービス名 | 例 | 意味 |
+| 項目名 | 例 | 意味 |
 | :----------------------------: | :----------------------------: | :----------------------------: |
-| TRAEFIK_DOMAIN | traefik.sld.tld | traefik（ロードバランサー）のドメイン |
+| USER_ID | 1000 | LinuxにおけるUser ID |
+| GROUP_ID | 1000 | LinuxにおけるGroup ID |
+| ROOT_DOMAIN | sld.tld | 他サービスが使用するベースドメイン |
 | TRAEFIK_USER | admin | traefikのユーザー名 |
 | TRAEFIK_PASSWORD | password | traefikのパスワード |
 | TRAEFIK_EMAIL | email@gmail.com | SSL証明書取得用のメールアドレス |
-| SWARMPIT_DOMAIN | swarmpit.sld.tld | swarmpit（docker swarmのWebUI）のドメイン |
 | DB_NAME | graph | ブロックチェーンデータを格納する postgreSQLのデータベース名 |
 | DB_USER | user | postgreSQLのユーザー名 |
 | DB_PASSWORD | password | postgreSQLのパスワード |
-| GRAPH_NODE_VERSION | v0.28.0 | graph-node(index-node/query-node)のバージョン |
-| GRAPH_NODE_LOG_LEVEL | DEBUG | graph-node(index-node/query-node)のログレベル |
-| QUERY_NODE_DOMAIN | query.sld.tld | query-node（クエリ提供ノード）のドメイン |
-| PROMETHEUS_DOMAIN | prometheus.sld.tld | prometheus（クライアントモニタ）のドメイン |
-| PROMETHEUS_USER | user | prometheusのユーザー名 |
+| PROMETHEUS_USER | admin | prometheusのユーザー名 |
 | PROMETHEUS_PASSWORD | password | prometheusのパスワード |
-| GRAFANA_DOMAIN | grafana.sld.tld | grafana（監視ダッシュボード）の ドメイン |
 | INDEXER_RPC | https://infura.io | インデクサー用のgoerli RPC API(Full Node) |
 | INDEXER_ADDRESS | 0x.... | インデクサーのgoerli ETHアドレス |
 | INDEXER_MNEMONIC | 12 words | INDEXER_ADDRESS に紐づくmnemonic |
-| INDEXER_GEO | 49.414 11.171 | サーバー（マネージャー）の 緯度経度 |
-| INDEXER_DOMAIN | indexer.sld.tld | インデクサーのドメイン |
-| CONSOLE_DOMAIN | console.sld.tld | インデクサー操作用のコンソールのドメイン |
-| CONSOLE_USER | user | コンソールのユーザー名 |
-| CONSOLE_PASSWORD | password | コンソールのパスワード |
-| CHAIN_GOERLI_RPC | https://infura.io | goerli RPC API(Archive Node), ankr/alchemy |
-| CHAIN_GNOSIS_RPC | https://infura.io | gnosis RPC API(Archive Node), ankr/chainstack |
-
+| INDEXER_GEO | "49.414 11.171" | サーバー（マネージャー）の 緯度経度 |
