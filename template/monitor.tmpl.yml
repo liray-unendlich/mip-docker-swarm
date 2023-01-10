@@ -37,15 +37,12 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
-        - "traefik.http.routers.monitor-prometheus-http.rule=Host(`${PROMETHEUS_DOMAIN}`)"
-        - traefik.http.routers.monitor-prometheus-http.entrypoints=http
-        - traefik.http.routers.monitor-prometheus-http.middlewares=https-redirect
-        - "traefik.http.routers.monitor-prometheus-https.rule=Host(`${PROMETHEUS_DOMAIN}`)"
-        - traefik.http.routers.monitor-prometheus-https.entrypoints=https
-        - traefik.http.routers.monitor-prometheus-https.tls=true
-        - traefik.http.routers.monitor-prometheus-https.tls.certresolver=le
+        - "traefik.http.routers.monitor-prometheus.rule=Host(`prometheus.${ROOT_DOMAIN}`)"
+        - traefik.http.routers.monitor-prometheus.entrypoints=https
+        - traefik.http.routers.monitor-prometheus.tls=true
+        - traefik.http.routers.monitor-prometheus.tls.certresolver=le
         - traefik.http.services.monitor-prometheus.loadbalancer.server.port=9090
-        - traefik.http.routers.monitor-prometheus-https.middlewares=prometheus-auth
+        - traefik.http.routers.monitor-prometheus.middlewares=prometheus-auth
         - traefik.http.middlewares.prometheus-auth.basicauth.users=${PROMETHEUS_USER}:${PROMETHEUS_HASHED_PASSWORD}
 
   grafana:
@@ -79,13 +76,10 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
-        - "traefik.http.routers.monitor-grafana-http.rule=Host(`${GRAFANA_DOMAIN}`)"
-        - traefik.http.routers.monitor-grafana-http.entrypoints=http
-        - traefik.http.routers.monitor-grafana-http.middlewares=https-redirect
-        - "traefik.http.routers.monitor-grafana-https.rule=Host(`${GRAFANA_DOMAIN}`)"
-        - traefik.http.routers.monitor-grafana-https.entrypoints=https
-        - traefik.http.routers.monitor-grafana-https.tls=true
-        - traefik.http.routers.monitor-grafana-https.tls.certresolver=le
+        - "traefik.http.routers.monitor-grafana.rule=Host(`grafana.${ROOT_DOMAIN}`)"
+        - traefik.http.routers.monitor-grafana.entrypoints=https
+        - traefik.http.routers.monitor-grafana.tls=true
+        - traefik.http.routers.monitor-grafana.tls.certresolver=le
         - traefik.http.services.monitor-grafana.loadbalancer.server.port=3000
 
 networks:
