@@ -26,7 +26,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.hostname == indexer-${CHAIN_NAME}
+          - node.role == manager
       labels:
         - traefik.enable=false
       resources:
@@ -42,7 +42,7 @@ services:
   ############################################################################
 
   query-node:
-    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
+    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.29.0}
     environment:
       GRAPH_NODE_CONFIG: /var/config/config.toml
       postgres_host: "postgres"
@@ -79,15 +79,15 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.hostname == indexer-${CHAIN_NAME}
+          - node.role == manager
       labels:
         - traefik.enable=false
 
-  index-node:
-    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.28.2}
+  index-node-0:
+    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.29.0}
     environment:
       GRAPH_NODE_CONFIG: /var/config/config.toml
-      BLOCK_INGESTOR: "index_node_${CHAIN_NAME}"
+      BLOCK_INGESTOR: "index_node_0"
       postgres_host: "postgres"
       postgres_db: "${DB_NAME}"
       postgres_user: "${DB_USER}"
@@ -95,7 +95,8 @@ services:
       ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
       GRAPH_KILL_IF_UNRESPONSIVE: "true"
       node_role: "index-node"
-      node_id: "index_node_${CHAIN_NAME}"
+      node_id: "index_node_0"
+      NODE_ID: "index_node_0"
       RUST_LOG: INFO
       GRAPH_LOG: ${GRAPH_NODE_LOGLEVEL:-DEBUG}
       STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
@@ -123,38 +124,55 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.hostname == indexer-${CHAIN_NAME}
+          - node.role == manager
 
-  ############################################################################
-  #                      node-exporter - Export data                         #
-  ############################################################################
-
-  node-exporter:
-    image: prom/node-exporter
+  index-node-1:
+    image: graphprotocol/graph-node:${GRAPH_NODE_VERSION:-v0.29.0}
+    environment:
+      GRAPH_NODE_CONFIG: /var/config/config.toml
+      DISABLE_BLOCK_INGESTOR: "true"
+      postgres_host: "postgres"
+      postgres_db: "${DB_NAME}"
+      postgres_user: "${DB_USER}"
+      postgres_pass: "${DB_PASSWORD}"
+      ipfs: "${IPFS_ENDPOINT:-https://ipfs.network.thegraph.com}"
+      GRAPH_KILL_IF_UNRESPONSIVE: "true"
+      node_role: "index-node"
+      node_id: "index_node_1"
+      NODE_ID: "index_node_1"
+      RUST_LOG: INFO
+      GRAPH_LOG: ${GRAPH_NODE_LOGLEVEL:-DEBUG}
+      STORE_CONNECTION_POOL_SIZE: ${STORE_CONNECTION_POOL_SIZE:-10}
+      ETHEREUM_TRACE_STREAM_STEP_SIZE: ${ETHEREUM_TRACE_STREAM_STEP_SIZE:-50}
+      ETHEREUM_BLOCK_BATCH_SIZE: ${ETHEREUM_BLOCK_BATCH_SIZE:-100}
+      ETHEREUM_RPC_MAX_PARALLEL_REQUESTS: ${ETHEREUM_RPC_MAX_PARALLEL_REQUESTS:-64}
+      GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE: ${GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE:-500}
+      GRAPH_ETHEREUM_TARGET_TRIGGERS_PER_BLOCK_RANGE: ${GRAPH_ETHEREUM_TARGET_TRIGGERS_PER_BLOCK_RANGE:-200}
+      GRAPH_ALLOW_NON_DETERMINISTIC_FULLTEXT_SEARCH: "true"
+      TZ: Asia/Tokyo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    configs:
+      - source: ${CHAIN_CONF_NAME}
+        target: /var/config/config.toml
     # Swarm
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.hostname == indexer-${CHAIN_NAME}
-      resources:
-        reservations:
-          cpus: "0.1"
-          memory: 512M
-      labels:
-        - traefik.enable=false
     networks:
       - default
       - monitor
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
 
 networks:
   default:
-    name: indexer_${CHAIN_NAME}_default
+    name: indexer_default
   monitor:
-    external: true
-  traefik-public:
     external: true
 configs:
   ${CHAIN_CONF_NAME}:
