@@ -15,7 +15,6 @@ services:
       - ../data/prometheus:/prometheus
     # Swarm
     networks:
-      - default
       - monitor
       - traefik-public
     configs:
@@ -58,7 +57,6 @@ services:
       - ../data/grafana:/var/lib/grafana
     # Swarm
     networks:
-      - default
       - monitor
       - traefik-public
     deploy:
@@ -82,9 +80,26 @@ services:
         - traefik.http.routers.monitor-grafana.tls.certresolver=le
         - traefik.http.services.monitor-grafana.loadbalancer.server.port=3000
 
+  ############################################################################
+  #                      node-exporter - Export data                         #
+  ############################################################################
+
+  node-exporter:
+    image: prom/node-exporter
+    # Swarm
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=false
+    networks:
+      - monitor
+
 networks:
-  default:
-    name: monitor_default
   monitor:
     external: true
   traefik-public:

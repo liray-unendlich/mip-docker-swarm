@@ -87,47 +87,6 @@ services:
         - traefik.http.services.indexer-service.loadbalancer.server.port=7600
 
   ############################################################################
-  #                      node-exporter - Export data                         #
-  ############################################################################
-
-  node-exporter:
-    image: prom/node-exporter
-    # Swarm
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.role == manager
-      labels:
-        - traefik.enable=false
-    networks:
-      - indexer_default
-      - monitor
-
-  ############################################################################
-  #                      postgres-exporter - Export data                     #
-  ############################################################################
-
-  postgres-exporter:
-    image: quay.io/prometheuscommunity/postgres-exporter
-    environment:
-      DATA_SOURCE_NAME: "postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.role == manager
-      labels:
-        - traefik.enable=false
-    networks:
-      - indexer_default
-      - monitor
-
-  ############################################################################
   #               indexer-console - WebUI for indexer-cli                    #
   ############################################################################
   indexer-cli:
@@ -144,6 +103,7 @@ services:
       placement:
         constraints:
           - node.role == manager
+
 networks:
   indexer_default:
     external: true
