@@ -62,6 +62,13 @@ cp example.env .env
 最後の行で、example.env を.env としてコピーしましたので、.env を自分用の設定に変更しましょう。
 example.env 自体に、env がそれぞれどのような意味か記載しています。
 
+### 5.1 以前のデータのうち、不要なデータを削除する
+これまでのMIPレポジトリと構造が変わったので、これまで動かしていた方は、次のコマンドを使ってデータを削除しましょう。
+```
+docker stack rm $(docker stack ls --format "{{.Name}}")
+rm -r ~/mip-docker-swarm/data/postgres/*
+```
+
 ## 6. スクリプトを動かして設定
 
 それでは、スクリプトを使って、サーバーごとの初期設定（docker swarm の設定用）を行いましょう。
