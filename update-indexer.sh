@@ -38,14 +38,14 @@ CHAIN_CONF_NAME=config-$(date +"%Y%m%d")
 
 echo "Generating docker swarm configuration files(deployment/indexer.yml)"
 set -o allexport; source .env; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/graph-node.tmpl.yml > deployment/graph-node.yml
-cp ./template/default.tmpl.agora > deployment/default.agora
+cp ./template/default.tmpl.agora deployment/default.agora
 
 echo "Deploying/updating graph-node stack"
 docker stack deploy -c deployment/graph-node.yml graph-node
 
 # Wait 15 seconds to complete deploying and generate new database with postgres
 sleep 15s
-docker exec -e PGPASSWORD=${DB_PASSWORD} -it $(docker ps | grep postgres | grep graph-node |cut -c 1-12) psql -U ${DB_USER} -d ${DB_NAME} -c "CREATE DATABASE indexer;"
+docker exec -e PGPASSWORD=${DB_PASSWORD} -it $(docker ps | grep postgres | grep graph-node | cut -c 1-12) psql -U ${DB_USER} -d ${DB_NAME} -c "CREATE DATABASE indexer;"
 
 echo "Deploying/updating indexer stack"
 set -o allexport; source .env; set +o allexport; envsubst < ./template/indexer.tmpl.yml > deployment/indexer.yml

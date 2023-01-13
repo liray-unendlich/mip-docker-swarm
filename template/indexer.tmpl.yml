@@ -1,37 +1,6 @@
 version: "3.5"
 services:
   ############################################################################
-  #          POSTGRES - Database for index-agent/index-service               #
-  ############################################################################
-  postgres-indexer:
-    image: postgres:13.6
-    user: $USER_ID:$GROUP_ID
-    command:
-      - "postgres"
-      - "-cshared_preload_libraries=pg_stat_statements"
-    environment:
-      PGDATA: /var/lib/postgresql/data
-      POSTGRES_DB: indexer
-      POSTGRES_USER: "${DB_USER}"
-      POSTGRES_PASSWORD: "${DB_PASSWORD}"
-      TZ: Asia/Tokyo
-    volumes:
-      - ../data/postgres:/var/lib/postgresql/data
-    # Swarm
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.hostname == indexer-manager
-      labels:
-        - traefik.enable=false
-    networks:
-      - default
-      - monitor
-
-  ############################################################################
   #                         Indexer Agent/Service                            #
   ############################################################################
 
@@ -64,7 +33,7 @@ services:
         max-size: "200k"
         max-file: "10"
     networks:
-      - default
+      - indexer_default
       - monitor
     deploy:
       mode: replicated
@@ -99,7 +68,7 @@ services:
         max-file: "10"
     # Swarm
     networks:
-      - default
+      - indexer_default
       - traefik-public
       - monitor
     deploy:
@@ -135,7 +104,7 @@ services:
       labels:
         - traefik.enable=false
     networks:
-      - default
+      - indexer_default
       - monitor
 
   ############################################################################
@@ -156,7 +125,7 @@ services:
       labels:
         - traefik.enable=false
     networks:
-      - default
+      - indexer_default
       - monitor
 
   ############################################################################
@@ -167,7 +136,7 @@ services:
     user: $USER_ID:$GROUP_ID
     tty: true
     networks:
-      - default
+      - indexer_default
     volumes:
       - ../deployment/default.agora:/home/graph/default.agora:ro
     logging:
@@ -177,8 +146,8 @@ services:
         constraints:
           - node.role == manager
 networks:
-  default:
-    name: indexer_default
+  indexer_default:
+    external: true
   monitor:
     external: true
   traefik-public:
