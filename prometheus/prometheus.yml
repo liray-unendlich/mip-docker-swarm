@@ -7,12 +7,12 @@ rule_files:
 alerting:
 
 scrape_configs:
-  - job_name: "graph-node-gnosis"
+  - job_name: "graph-node"
     static_configs:
-      - targets: ["index-node:8040", "query-node:8040"]
+      - targets: ["index-node-0:8040", "index-node-1:8040", "query-node:8040"]
   - job_name: "indexer"
     static_configs:
-      - targets: ["indexer-service:7300"]
+      - targets: ["indexer-agent:7300", "indexer-service:7300"]
   - job_name: "traefik"
     static_configs:
       - targets: ["traefik:8080"]
@@ -21,5 +21,4 @@ scrape_configs:
       - targets: ["postgres-exporter:9187"]
   - job_name: "node-exporter"
     static_configs:
-      - targets:
-          ["indexer-gnosis_node-exporter:9100", "indexer_node-exporter:9100"]
+      - targets: ["node-exporter:9100"]
