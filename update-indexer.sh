@@ -32,12 +32,6 @@ if [ -z "$INDEXER_GEO" ]; then
   sed -i -e "$ a INDEXER_GEO=\"${INDEXER_GEO}\"" .env
 fi
 
-if [ -z "$INDEXER_DOMAIN" ]; then
-  echo -n "Enter your indexer domain:"
-  read INDEXER_DOMAIN
-  sed -i -e "$ a INDEXER_DOMAIN=${INDEXER_DOMAIN}" .env
-fi
-
 echo "Deploying configuration files"
 docker config create config-$(date +"%Y%m%d") graph-node-config/config.toml
 CHAIN_CONF_NAME=config-$(date +"%Y%m%d")
