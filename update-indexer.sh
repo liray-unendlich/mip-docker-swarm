@@ -33,8 +33,9 @@ if [ -z "$INDEXER_GEO" ]; then
 fi
 
 echo "Deploying configuration files"
-docker config create config-$(date +"%Y%m%d") graph-node-config/config.toml
-CHAIN_CONF_NAME=config-$(date +"%Y%m%d")
+RANDOM_TAG=${RANDOM:0:3}
+docker config create config-$(date +"%Y%m%d")-$RANDOM_TAG graph-node-config/config.toml
+CHAIN_CONF_NAME=config-$(date +"%Y%m%d")-$RANDOM_TAG
 
 echo "Generating docker swarm configuration files(deployment/indexer.yml)"
 set -o allexport; source .env; CHAIN_CONF_NAME=${CHAIN_CONF_NAME}; set +o allexport; envsubst < ./template/graph-node.tmpl.yml > deployment/graph-node.yml

@@ -34,8 +34,9 @@ PROMETHEUS_HASHED_PASSWORD=$(openssl passwd -apr1 $PROMETHEUS_PASSWORD)
 TRAEFIK_HASHED_PASSWORD=${TRAEFIK_HASHED_PASSWORD//\$/\$\$}
 PROMETHEUS_HASHED_PASSWORD=${PROMETHEUS_HASHED_PASSWORD//\$/\$\$}
 
-docker config create prometheus-$(date +"%Y%m%d") prometheus/prometheus.yml
-PROMETHEUS_CONF_NAME=prometheus-$(date +"%Y%m%d")
+RANDOM_TAG=${RANDOM:0:3}
+docker config create prometheus-$(date +"%Y%m%d")-$RANDOM_TAG prometheus/prometheus.yml
+PROMETHEUS_CONF_NAME=prometheus-$(date +"%Y%m%d")-$RANDOM_TAG
 
 set -o allexport; source .env; TRAEFIK_HASHED_PASSWORD=${TRAEFIK_HASHED_PASSWORD}; set +o allexport; envsubst < ./template/traefik.tmpl.yml > deployment/traefik.yml
 set -o allexport; source .env; set +o allexport; envsubst < ./template/swarmpit.tmpl.yml > deployment/swarmpit.yml
