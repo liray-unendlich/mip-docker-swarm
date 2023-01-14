@@ -1,7 +1,8 @@
 # mip-docker-swarm
 
 MIP テストネットへの対応として、サーバーに以下の構造のサービスを稼働させ、クエリサービスを様々なチェーンで提供します。
-![mip-powerpoint](https://user-images.githubusercontent.com/15893314/196847508-ed85f067-45ba-4881-a333-7f25209154ad.png)
+
+<img src="https://user-images.githubusercontent.com/15893314/196847508-ed85f067-45ba-4881-a333-7f25209154ad.png" width="60%">
 
 今回の構成では、Contabo Cloud VPS XL 1 台を借りて構成を作ることにしました（チェーン数が増えれば増えるほど、負荷が厳しくなる可能性があります。その場合、適宜サーバー数を増やします）。
 既に、Gnosisチェーンではメインネットでのクエリ提供が開始されています。このブランチでは、あくまでテストネット用のサービス提供体制とします（管理がややこしいんですが、しょうがないです）。
@@ -10,13 +11,13 @@ MIP テストネットへの対応として、サーバーに以下の構造の�
 手続きは、以下のとおりです。
 
 1. VPS を契約する
-1. ENS(goerli), ドメイン(gunu-node.comみたいなやつ)を取得する
-1. VPS の初期設定をする（https://ayame.space/2021/03/ubuntu-20-04-initialize/ の Docker 環境の構築直前までぐらいやれば十分）
-1. docker をインストールする
-1. github レポをクローンする
-1. 以下のドキュメントに従い設定する
-1. 動くか確認する
-1. レポジトリの更新があったときに更新する
+2. ENS(goerli), ドメイン(gunu-node.comみたいなやつ)を取得する
+3. VPS の初期設定をする（https://ayame.space/2021/03/ubuntu-20-04-initialize/ の Docker 環境の構築直前までぐらいやれば十分）
+4. docker をインストールする
+5. github レポをクローンする
+6. 以下のドキュメントに従い設定する
+7. 動くか確認する
+8. レポジトリの更新があったときに更新する
 
 ここでは、最初の 1~3 を省略し、4 からやっていきます。
 2 についてのみ、注意点があります。
@@ -100,7 +101,7 @@ bash init-manager.sh
 スクリプト実行時、管理者パスワードの入力が必要となります。このスクリプトによって、docker swarm のクラスターが生成され、traefik/swarmpit/portainer/prometheus/grafana をインストールしました。サーバーの動作が適切になされているかを確認するため、Web UI(Swarmpit/Portainer)を確認しましょう。
 
 [envファイルの設定事項について](#envファイルの設定事項について) で設定した"swarmpit.sld.tld/portainer.sld.tld"に接続してみましょう。すると、最初にアカウント設定を要求された後、ログインできるようになるはずです。ここでは、複数のサーバーにまたがって同じクラスターのサーバーの処理状況やプロセス状況を確認することが出来ます（下に例画像を張り付けています）。後で初期設定をする、インデックスサーバーの設定のログや、様々な設定を WebUI から変更できます。
-![image](https://user-images.githubusercontent.com/15893314/193424568-f43cead3-bdb2-44ff-bb1c-85151d7a7c2e.png)
+<img src="https://user-images.githubusercontent.com/15893314/193424568-f43cead3-bdb2-44ff-bb1c-85151d7a7c2e.png" width="60%">
 
 ## 7.インデクサーをgoerliテストネット上で稼働させる
 次に、必要なサービスとなる、以下4サービスを稼働させます。
@@ -114,7 +115,8 @@ cp graph-node-config/config.tmpl graph-node-config/config.toml
 nano graph-node-config/config.toml
 ```
 このコマンドにより、次の画像のような画面が表示されるはずです。
-![image](https://user-images.githubusercontent.com/15893314/212449693-cf6dc1c4-0e71-4fd2-8b6d-2bc751c13dfc.png)
+<img src="https://user-images.githubusercontent.com/15893314/212449693-cf6dc1c4-0e71-4fd2-8b6d-2bc751c13dfc.png" width="60%">
+
 このファイルは、インデックスノード及びクエリノードが、様々なチェーンで適切にデータを取得するための設定ファイルになっています。すなわち、どんなチェーンを、どのようなエンドポイントの組からデータ取得するかを定義しています。[graph-nodeのconfigについて](#graph-nodeのconfigについて) から、設定方法をご覧ください。
 
 さて、config.tomlが適切に設定出来たら、サーバー上で、次のコマンドを一行ずつ実施します。
@@ -123,10 +125,11 @@ chmod +x update-indexer.sh
 bash update-indexer.sh
 ```
 このコマンドが完了すれば、swarmpit/portainerから次の画像のようにインデクサーが起動していることがわかるはずです。
-![image](https://user-images.githubusercontent.com/15893314/212449729-8db86657-d936-4684-a724-683f929df9ca.png)
+<img src="https://user-images.githubusercontent.com/15893314/212449729-8db86657-d936-4684-a724-683f929df9ca.png" width="60%">
 
 また、この動画のようにportainerを操作することで、ブラウザ上でコンテナへのアクセス・コマンド送信が出来るようになります。この動画では、indexer-cliを操作して、indexer statusを表示させています。
-![portainer-indexer-status](https://user-images.githubusercontent.com/15893314/212449782-0f859af9-47d6-448d-87f9-e9c5618bcfa0.gif)
+
+<img src="https://user-images.githubusercontent.com/15893314/212449782-0f859af9-47d6-448d-87f9-e9c5618bcfa0.gif" width="80%">
 
 ### Goerliテストネット上でインデクサーを登録する
 
@@ -260,7 +263,7 @@ query = "query_node_*"
 ### envファイルの設定事項について
 envファイルの設定事項がどんどん増えてきたので、以下に内容を列記します
 | 項目名 | 例 | 意味 |
-| :----------------------------: | :----------------------------: | :----------------------------: |
+| :--------------------------: | :--------------------------: | :--------------------------: |
 | USER_ID | 1000 | LinuxにおけるUser ID |
 | GROUP_ID | 1000 | LinuxにおけるGroup ID |
 | ROOT_DOMAIN | sld.tld | 他サービスが使用するベースドメイン |
