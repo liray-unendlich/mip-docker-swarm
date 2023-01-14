@@ -1,6 +1,6 @@
 # mip-docker-swarm
 
-MIP テストネットへの対応として、サーバーに以下の構造のサービスを稼働させ、クエリサービスを様々なチェーンで提供しましょう。
+MIP テストネットへの対応として、サーバーに以下の構造のサービスを稼働させ、クエリサービスを様々なチェーンで提供します。
 ![mip-powerpoint](https://user-images.githubusercontent.com/15893314/196847508-ed85f067-45ba-4881-a333-7f25209154ad.png)
 
 今回の構成では、Contabo Cloud VPS XL 1 台を借りて構成を作ることにしました（チェーン数が増えれば増えるほど、負荷が厳しくなる可能性があります。その場合、適宜サーバー数を増やします）。
@@ -113,7 +113,9 @@ env(##5)で設定した"swarmpit.sld.tld/portainer.sld.tld"に接続してみま
 cp graph-node-config/config.tmpl graph-node-config/config.toml
 nano graph-node-config/config.toml
 ```
-このコマンドにより、次の画像のような画面が表示されるはずです。このファイルは、インデックスノード及びクエリノードが、様々なチェーンで適切にデータを取得するための設定ファイルになっています。すなわち、どんなチェーンを、どのようなエンドポイントの組からデータ取得するかを定義しています。[graph-nodeのconfigについて](#graph-nodeのconfigについて) から、設定方法をご覧ください。
+このコマンドにより、次の画像のような画面が表示されるはずです。
+![image](https://user-images.githubusercontent.com/15893314/212449693-cf6dc1c4-0e71-4fd2-8b6d-2bc751c13dfc.png)
+このファイルは、インデックスノード及びクエリノードが、様々なチェーンで適切にデータを取得するための設定ファイルになっています。すなわち、どんなチェーンを、どのようなエンドポイントの組からデータ取得するかを定義しています。[graph-nodeのconfigについて](#graph-nodeのconfigについて) から、設定方法をご覧ください。
 
 さて、config.tomlが適切に設定出来たら、サーバー上で、次のコマンドを一行ずつ実施します。
 ```
@@ -121,6 +123,10 @@ chmod +x update-indexer.sh
 bash update-indexer.sh
 ```
 このコマンドが完了すれば、swarmpit/portainerから次の画像のようにインデクサーが起動していることがわかるはずです。
+![image](https://user-images.githubusercontent.com/15893314/212449729-8db86657-d936-4684-a724-683f929df9ca.png)
+
+また、この動画のようにportainerを操作することで、ブラウザ上でコンテナへのアクセス・コマンド送信が出来るようになります。この動画では、indexer-cliを操作して、indexer statusを表示させています。
+![portainer-indexer-status](https://user-images.githubusercontent.com/15893314/212449782-0f859af9-47d6-448d-87f9-e9c5618bcfa0.gif)
 
 ### Goerliテストネット上でインデクサーを登録する
 
@@ -215,7 +221,9 @@ pool_size = 10
 ingestor = "index_node_0"
 
 # Chainstackのような、フルノードとアーカイブノードのAPI費用に差があるようなサービスでは、フルノードとアーカイブノードを別々に設定することで、比較的安価にインデックスが可能になります。
-# providerにて、各サービスへの接続を設定しています。featuresにて、指定したサービスがフルノードか、アーカイブノードか、トレース有のアーカイブノードかを指定します。それぞれ、[],["archive"],["archive", "traces"]と指定することで、適切な設定になります。下の例では、polygon-xxxとしてフルノードを、polygon-yyyとしてトレース有のアーカイブノードを指定しています。
+# providerにて、各サービスへの接続を設定しています。featuresにて、指定したサービスがフルノードか、アーカイブノードか、トレース有のアーカイブノードかを指定します。
+# それぞれ、[],["archive"],["archive", "traces"]と指定することで、適切な設定になります。
+# 下の例では、polygon-xxxとしてフルノードを、polygon-yyyとしてトレース有のアーカイブノードを指定しています。
 # もし、polygonでのインデックスをしない場合、[chains.polygon]のセクションはまるごと削除してください。
 [chains.polygon]
 shard = "primary"
