@@ -30,6 +30,23 @@ MIP テストネットへの対応として、サーバーに以下の構造の�
 | grafana | grafana.sld.tld | サーバー（マネージャー）の IP |
 | indexer | indexer.sld.tld | サーバー（マネージャー）の IP |
 
+目次は以下のとおりです。
+- [mip-docker-swarm](#mip-docker-swarm)
+  - [4. docker をインストールする](#4-docker-をインストールする)
+  - [5. github レポをクローンする](#5-github-レポをクローンする)
+    - [5.1 以前のデータのうち、不要なデータを削除する](#51-以前のデータのうち不要なデータを削除する)
+  - [6. スクリプトを動かして設定](#6-スクリプトを動かして設定)
+  - [7.インデクサーをgoerliテストネット上で稼働させる](#7インデクサーをgoerliテストネット上で稼働させる)
+    - [Goerliテストネット上でインデクサーを登録する](#goerliテストネット上でインデクサーを登録する)
+    - [オペレーターを設定する](#オペレーターを設定する)
+    - [サブグラフへのアロケーション](#サブグラフへのアロケーション)
+    - [サブグラフへのアロケーションの終了](#サブグラフへのアロケーションの終了)
+  - [8. 使い方に慣れる](#8-使い方に慣れる)
+  - [9. レポジトリの更新に合わせて更新する](#9-レポジトリの更新に合わせて更新する)
+  - [10. 備考](#10-備考)
+    - [graph-nodeのconfigについて](#graph-nodeのconfigについて)
+    - [envファイルの設定事項について](#envファイルの設定事項について)
+
 ## 4. docker をインストールする
 
 docker は、次のコマンドをサーバー上で実行して、インストールしましょう。
@@ -61,7 +78,7 @@ cp example.env .env
 
 ここまでで、コードのダウンロードが完了しました。
 最後の行で、example.env を.env としてコピーしましたので、.env を自分用の設定に変更しましょう。
-example.env 自体に、env がそれぞれどのような意味か記載しています。
+詳しくは、 [envファイルの設定事項について](#envファイルの設定事項について) を確認ください。
 
 ### 5.1 以前のデータのうち、不要なデータを削除する
 これまでのMIPレポジトリと構造が変わったので、これまで動かしていた方は、次のコマンドを使ってデータを削除しましょう。
@@ -96,16 +113,14 @@ env(##5)で設定した"swarmpit.sld.tld/portainer.sld.tld"に接続してみま
 cp graph-node-config/config.tmpl graph-node-config/config.toml
 nano graph-node-config/config.toml
 ```
-このコマンドにより、次の画像のような画面が表示されるはずです。このファイルは、インデックスノード及びクエリノードが、様々なチェーンで適切にデータを取得するための設定ファイルになっています。すなわち、どんなチェーンを、どのようなエンドポイントの組からデータ取得するかを定義しています。こちらから、設定方法をご覧ください（一例も載せています）。
-
+このコマンドにより、次の画像のような画面が表示されるはずです。このファイルは、インデックスノード及びクエリノードが、様々なチェーンで適切にデータを取得するための設定ファイルになっています。すなわち、どんなチェーンを、どのようなエンドポイントの組からデータ取得するかを定義しています。[graph-nodeのconfigについて](#graph-nodeのconfigについて) から、設定方法をご覧ください。
 
 さて、config.tomlが適切に設定出来たら、サーバー上で、次のコマンドを一行ずつ実施します。
 ```
 chmod +x update-indexer.sh
 bash update-indexer.sh
 ```
-
-このコマンドが完了すれば、swarmpit/portainerから次の画像のように設定が出来ていることがわかるはずです。
+このコマンドが完了すれば、swarmpit/portainerから次の画像のようにインデクサーが起動していることがわかるはずです。
 
 ### Goerliテストネット上でインデクサーを登録する
 
@@ -118,7 +133,7 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 
 これが完了すると、インデクサーとしての登録が完了します。※オペレーター設定はオプションなので、テストネットの報酬とは直接関係ありません。
 
-#### オペレーターを設定する
+### オペレーターを設定する
 
 次に、オペレーターとしてサブのウォレットを設定します（インデクサーウォレットとオペレーションウォレットを分ける人はこれをやるとよい）。
 
@@ -127,7 +142,7 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 1. 右上のアバターをクリックする
 1. Operators ボタンをクリックし、+ ボタンを押して他のアドレスを追加する
 
-#### サブグラフへのアロケーション
+### サブグラフへのアロケーション
 次に、サブグラフをインデックス開始するための手続きを説明します。
 portainerより、stack > indexer > indexer-cli と移動し、コンソールを開きましょう。
 次のコマンドを一行ずつ入力し、アロケーションを行いましょう。
@@ -139,21 +154,40 @@ graph indexer allocations create QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq 
 ```
 このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaのダッシュボードで確認すると、インデックスが開始しているはずです。
 
-## 9. 使い方に慣れる
+次のコマンドを実行することで、今有効になっているアロケーションの一覧を取得できます。
+```
+graph indexer allocations get --status active
+```
+アロケーションを終了する際は、アロケーションのIDが必要になるので、注意してください。
+
+### サブグラフへのアロケーションの終了
+次に、インデックスをやめたいサブグラフ（というかアロケーション）を終了するための手続きを説明します。
+portainerより、stack > indexer > indexer-cliと移動し、コンソールを開きましょう。
+次のコマンドを一行ずつ入力し、アロケーションを終了しましょう。
+```
+graph indexer allocations close *アロケーションのID*
+```
+
+ただし、サブグラフが同期しきっていなければ、この方法ではアロケーションを終了できません。もし、報酬が無くてもいいから、強制的にアロケーションを終了するときには、次のコマンドを使いましょう。
+```
+graph indexer allocations close *アロケーションのID* 0x0 --force
+```
+
+## 8. 使い方に慣れる
 
 今回、以下の docker stack を生成・運用しています。
 
-- Swarmpit(docker swarm の WebUI. このスクリプトでは、config を docker swarm の機能を使用してアップロードしているので、原理的には、docker swarm にサーバーを入れた後は、全て Swarmpit 上からこれからは設定が出来るようになります。ただし、phase0 で要求されている curl コマンドは VPS 上でしか出来ないようにしています（セキュリティを考慮しています）)
-- Traefik(URL のハンドリングをしてくれています。SSL 証明書等の発行もまとめてやってくれます。basicauth もやっています)
-- Prometheus(index-node, query-node や、それぞれのノードの node-exporter から情報を受け取り、蓄積しています)
+- Swarmpit/Portainer(docker swarm の WebUI. このスクリプトでは、config を docker swarm の機能を使用してアップロードしているので、原理的には、docker swarm にサーバーを入れた後は、全て SwarmpitもしくはPortainer 上からこれからは設定が出来るようになります。curlコマンド等はportainer上でやります)
+- Traefik(ロードバランサー。SSL 証明書等の発行もまとめてやってくれます。basicauth もやっています)
+- Prometheus(index-node, query-node や、node-exporter から情報を受け取り、蓄積しています)
 - Grafana(prometheus から受け取った情報や、postgreSQL から取り出したデータを可視化します)
 - postgreSQL
 - index-node(graph-node の役割がインデックスのもの。)
 - indexer-agent/service(index-node/query-node を管理し、外部から来たクエリに応答します)
 
-実際にいろんな画面（特に Swarmpit と Grafana）を見てみてください。
+実際にいろんな画面（特に Swarmpit/Portainer と Grafana）を見てみてください。
 
-## 10. レポジトリの更新に合わせて更新する
+## 9. レポジトリの更新に合わせて更新する
 今後、サーバーの更新は、原則次の２行のコマンドを1行ごとにサーバー上で実施することで行われます。
 ※この中には、設定ファイルの更新は含んでいません。
 ```
@@ -161,62 +195,57 @@ bash init-manager.sh
 bash update-indexer.sh
 ```
 
-## 11. もっとカスタムしたいとき
+## 10. 備考
 
 もっとカスタムしたい人向けに、簡単なメモを入れておきます。
 
-### 複数の RPC API を使って接続したい
+### graph-nodeのconfigについて
 
-swarmpit -> configs の中に、`config-日付`というファイルが見つかるはずです。このファイルの中には、下のような情報が記載されています。この config ファイルを直接サービスに読み込ませることで、ファイルを直接サーバーに受け渡しせず、設定が可能になっています。
+graph-node-config/config.tmpl には、下のような情報が記載されています。この config ファイルを直接サービスに読み込ませることで、設定が出来ます。
 
 ```
+# インデックスデータを保管するDBを指定する。自動で.envからロードしないので、自分で入れてください・・・・。
 [store]
 [store.primary]
-connection = "postgresql://DBのユーザー名:DBのパスワード@postgres:5432/DB名"
+connection = "postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}"
 pool_size = 10
 
+# 各ブロックチェーンの最新ブロックまでの同期をどのindex-nodeが行うか指定します。そのままでOK。
 [chains]
-ingestor = "index_node_gnosis"
+ingestor = "index_node_0"
 
+# Chainstackのような、フルノードとアーカイブノードのAPI費用に差があるようなサービスでは、フルノードとアーカイブノードを別々に設定することで、比較的安価にインデックスが可能になります。
+# providerにて、各サービスへの接続を設定しています。featuresにて、指定したサービスがフルノードか、アーカイブノードか、トレース有のアーカイブノードかを指定します。それぞれ、[],["archive"],["archive", "traces"]と指定することで、適切な設定になります。下の例では、polygon-xxxとしてフルノードを、polygon-yyyとしてトレース有のアーカイブノードを指定しています。
+# もし、polygonでのインデックスをしない場合、[chains.polygon]のセクションはまるごと削除してください。
+[chains.polygon]
+shard = "primary"
+provider = [ { label = "polygon-xxx", url = "https://xxx.io/", features = [] },
+             { label = "polygon-yyy", url = "https://yyy.io/", features = ["archive", "traces"] }
+]
+
+# もし、gnosisでのインデックスをしない場合、[chains.gnosis]のセクションはまるごと削除してください。
 [chains.gnosis]
 shard = "primary"
-provider = [ { label = "gnosis-full", url = "gnosisのfull nodeアドレス(ankr/chainstack)", features = [] },
-             { label = "gnosis-archive", url = "gnosisのarchive nodeアドレス(ankr/chainstack)", features = ["archive"] },
-             { label = "gnosis-trace", url = "gnosisのarchive node(traceあり)アドレス(chainstack)", features = ["archive", "trace"] }
-           ]
+provider = [ { label = "gnosis-xxx", url = "https://xxx.io/", features = [] },
+             { label = "gnosis-yyy", url = "https://yyy.io/", features = ["archive", "traces"] }
+]
 
-[chains.goerli]
+# もし、Ethereumでのインデックスをしない場合、[chains.mainnet]のセクションはまるごと削除してください。
+[chains.mainnet]
 shard = "primary"
-provider = [ { label = "goerli-full", url = "goerliのfull nodeアドレス(infura/alchemy/ankr/chainstack)", features = [] },
-             { label = "goerli-archive", url = "goerliのarchive nodeアドレス(alchemy/ankr)", features = ["archive"] },
-             { label = "goerli-trace", url = "goerliのarchive node(traceあり)アドレス(不明・とりあえず無くてOK)", features = ["archive", "trace"] }
-           ]
+provider = [ { label = "gnosis-xxx", url = "https://xxx.io/", features = [] },
+             { label = "gnosis-yyy", url = "https://yyy.io/", features = ["archive", "traces"] }
+]
 
-[deployment]
+# インデックスを行う際の、各インデックスノードへの割り当てルールを規定します。そのままでOK。
 [[deployment.rule]]
-indexers = [ "index_node_gnosis" ]
+shard = [ "primary" ]
+indexers = [ "index_node_0", "index_node_1" ]
 
+# クエリデータを作成するノードを指定します。そのままでOK。
 [general]
 query = "query_node_*"
-
 ```
-
-ここで、[chains.gnosis]/[chains.goerli]内にある provider を次のように書き換えると、RPC API を追加できます。
-ただし、features は次のように選びましょう。
-| features | ノード種類 |
-| --- | --- |
-| [] | フルノード |
-| archive | アーカイブノード |
-| traces | トレースが有効なノード（アーカイブノード） |
-
-実際にgraph-nodeにこの設定を読み込ませるには、次の手続きでやる必要があります。
-1. swarmpitのstacksを選択
-2. indexer-gnosisを選択
-3. 右上editを選択
-4. 全ての`config-日付`を新しいconfigの名前に修正
-5. deployを選択
-
-こうすると、トップページ -> Configs -> 追加したもの から、最下部を見るとどのサービスにリンクされるか表示されるので、ここでindex-node/query-nodeが追加されて入れば設定は完了です。
 
 ### envファイルの設定事項について
 envファイルの設定事項がどんどん増えてきたので、以下に内容を列記します
