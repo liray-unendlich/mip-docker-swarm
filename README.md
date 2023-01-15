@@ -212,6 +212,7 @@ bash update-indexer.sh
 ### graph-nodeのconfigについて
 
 graph-node-config/config.tmpl には、下のような情報が記載されています。この config ファイルを直接サービスに読み込ませることで、設定が出来ます。
+下設定例の下に、各サービスの対応状況を表で記載しています。
 
 ```
 # インデックスデータを保管するDBを指定する。自動で.envからロードしないので、自分で入れてください・・・・。
@@ -260,6 +261,13 @@ indexers = [ "index_node_0", "index_node_1" ]
 [general]
 query = "query_node_*"
 ```
+こちらは、サービスごとの対応状況です。
+| サービス名 | features | 備考 |
+| :--------------------------: | :--------------------------: | :--------------------------: |
+| Chainstack | [] | Archiveを指定していないとき |
+| Chainstack | ["archive", "traces"] | Archiveを指定しているとき |
+| Ankr | ["archive"] | - |
+| QuickNode | [] | まだ検証してません |
 
 ### envファイルの設定事項について
 envファイルの設定事項がどんどん増えてきたので、以下に内容を列記します
