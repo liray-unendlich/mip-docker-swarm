@@ -158,11 +158,11 @@ portainerより、stack > indexer > indexer-cli と移動し、コンソール�
 次のコマンドを一行ずつ入力し、アロケーションを行いましょう。
 
 _※1/18現在、1つのサブグラフが破損しているので、下のコマンドリストには含めてません。_
-また、100000は割り当てたい枚数に適宜変更してください（枚数の大小は報酬に影響しません）。
+また、40000は割り当てたい枚数に適宜変更してください（枚数の大小は報酬に影響しません）。
 ```
-graph indexer rules set QmcWyUejpse9agsiB6xitDhZpyox4aqir4ARReJwUsTY45 decisionBasis always allocationAmount 100000
-graph indexer rules set QmZ2egWxWWiEoxujgVVvqLyvh2yNG8Q8QyXvmoWYDiB4Ua decisionBasis always allocationAmount 100000
-graph indexer rules set QmYe4UxoSPD71dfsgnD8d34M5t3YgswwLLeLRrNJ3v4hqA decisionBasis always allocationAmount 100000
+graph indexer rules set QmcWyUejpse9agsiB6xitDhZpyox4aqir4ARReJwUsTY45 decisionBasis always allocationAmount 40000
+graph indexer rules set QmZ2egWxWWiEoxujgVVvqLyvh2yNG8Q8QyXvmoWYDiB4Ua decisionBasis always allocationAmount 40000
+graph indexer rules set QmYe4UxoSPD71dfsgnD8d34M5t3YgswwLLeLRrNJ3v4hqA decisionBasis always allocationAmount 40000
 ```
 このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaのダッシュボードで確認すると、インデックスが開始しているはずです。
 
