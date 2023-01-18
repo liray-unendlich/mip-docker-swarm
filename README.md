@@ -156,11 +156,13 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 次に、サブグラフをインデックス開始するための手続きを説明します。
 portainerより、stack > indexer > indexer-cli と移動し、コンソールを開きましょう。
 次のコマンドを一行ずつ入力し、アロケーションを行いましょう。
-※1/18現在、1つのサブグラフが破損しているので、下のコマンドリストには含めてません。
+
+_※1/18現在、1つのサブグラフが破損しているので、下のコマンドリストには含めてません。_
+また、100000は割り当てたい枚数に適宜変更してください（枚数の大小は報酬に影響しません）。
 ```
-graph indexer allocations create QmcWyUejpse9agsiB6xitDhZpyox4aqir4ARReJwUsTY45 割当てたい枚数(ex. 100000) index_node_0
-graph indexer allocations create QmZ2egWxWWiEoxujgVVvqLyvh2yNG8Q8QyXvmoWYDiB4Ua 割当てたい枚数 index_node_0
-graph indexer allocations create QmYe4UxoSPD71dfsgnD8d34M5t3YgswwLLeLRrNJ3v4hqA 割当てたい枚数 index_node_0
+graph indexer rules set QmcWyUejpse9agsiB6xitDhZpyox4aqir4ARReJwUsTY45 decisionBasis always allocationAmount 100000
+graph indexer rules set QmZ2egWxWWiEoxujgVVvqLyvh2yNG8Q8QyXvmoWYDiB4Ua decisionBasis always allocationAmount 100000
+graph indexer rules set QmYe4UxoSPD71dfsgnD8d34M5t3YgswwLLeLRrNJ3v4hqA decisionBasis always allocationAmount 100000
 ```
 このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaのダッシュボードで確認すると、インデックスが開始しているはずです。
 
