@@ -40,7 +40,7 @@ MIP テストネットへの対応として、サーバーに以下の構造の�
   - [7.インデクサーをgoerliテストネット上で稼働させる](#7インデクサーをgoerliテストネット上で稼働させる)
     - [Goerliテストネット上でインデクサーを登録する](#goerliテストネット上でインデクサーを登録する)
     - [オペレーターを設定する](#オペレーターを設定する)
-    - [サブグラフへのアロケーション](#サブグラフへのアロケーション)
+    - [サブグラフへのアロケーション（MIPで指定されたサブグラフを同期開始）](#サブグラフへのアロケーションmipで指定されたサブグラフを同期開始)
     - [サブグラフへのアロケーションの終了](#サブグラフへのアロケーションの終了)
   - [8. 使い方に慣れる](#8-使い方に慣れる)
   - [9. レポジトリの更新に合わせて更新する](#9-レポジトリの更新に合わせて更新する)
@@ -152,15 +152,15 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 1. 右上のアバターをクリックする
 1. Operators ボタンをクリックし、+ ボタンを押して他のアドレスを追加する
 
-### サブグラフへのアロケーション（polygonではまだサブグラフが告知されてないのでやらなくてOK）
+### サブグラフへのアロケーション（MIPで指定されたサブグラフを同期開始）
 次に、サブグラフをインデックス開始するための手続きを説明します。
 portainerより、stack > indexer > indexer-cli と移動し、コンソールを開きましょう。
 次のコマンドを一行ずつ入力し、アロケーションを行いましょう。
+※1/18現在、1つのサブグラフが破損しているので、下のコマンドリストには含めてません。
 ```
-graph indexer allocations create QmW8Cbb2R4ZHWGsrYjNJKRjoKKcPeDTNK6rdipfQQaAhd6 割当てたい枚数 index_node_0
-graph indexer allocations create QmWq1pmnhEvx25qxpYYj9Yp6E1xMKMVoUjXVQBxUJmreSe 割当てたい枚数 index_node_0
-graph indexer allocations create QmSqJEGHp1PcgvBYKFF2u8vhJZt8JTq18EV7mCuuZZiutX 割当てたい枚数 index_node_0
-graph indexer allocations create QmeVXKzGKSyfEQib4MzeZveJgDYJCYDMMHc1pPevWeSbsq 割当てたい枚数 index_node_0
+graph indexer allocations create QmcWyUejpse9agsiB6xitDhZpyox4aqir4ARReJwUsTY45 割当てたい枚数(ex. 100000) index_node_0
+graph indexer allocations create QmZ2egWxWWiEoxujgVVvqLyvh2yNG8Q8QyXvmoWYDiB4Ua 割当てたい枚数 index_node_0
+graph indexer allocations create QmYe4UxoSPD71dfsgnD8d34M5t3YgswwLLeLRrNJ3v4hqA 割当てたい枚数 index_node_0
 ```
 このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaのダッシュボードで確認すると、インデックスが開始しているはずです。
 
