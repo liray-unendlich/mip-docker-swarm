@@ -120,6 +120,8 @@ nano graph-node-config/config.toml
 
 このファイルは、インデックスノード及びクエリノードが、様々なチェーンで適切にデータを取得するための設定ファイルになっています。すなわち、どんなチェーンを、どのようなエンドポイントの組からデータ取得するかを定義しています。[graph-nodeのconfigについて](#graph-nodeのconfigについて) から、設定方法をご覧ください。
 
+※現在は、*Arbitrum-one* でのインデックステストを行っています。下のサブグラフ一覧から、必要なサブグラフに割当を行いましょう。
+
 さて、config.tomlが適切に設定出来たら、サーバー上で、次のコマンドを一行ずつ実施します。
 ```
 chmod +x update-indexer.sh
@@ -160,9 +162,10 @@ portainerより、stack > indexer > indexer-cli と移動し、コンソール�
 _※1/18現在、1つのサブグラフが破損しているので、下のコマンドリストには含めてません。_
 また、40000は割り当てたい枚数に適宜変更してください（枚数の大小は報酬に影響しません）。
 ```
-graph indexer rules set QmcWyUejpse9agsiB6xitDhZpyox4aqir4ARReJwUsTY45 decisionBasis always allocationAmount 40000
-graph indexer rules set QmZ2egWxWWiEoxujgVVvqLyvh2yNG8Q8QyXvmoWYDiB4Ua decisionBasis always allocationAmount 40000
-graph indexer rules set QmYe4UxoSPD71dfsgnD8d34M5t3YgswwLLeLRrNJ3v4hqA decisionBasis always allocationAmount 40000
+graph indexer rules set QmdPYiwtdBqeDKeMHKWDhuJFxu1TAxWP3qo2Peptia4sLB decisionBasis always allocationAmount 40000
+graph indexer rules set QmVbEmYjNRU5zyRDq6WDCWLnq952vDVWaM8AmVtvxpMy4b decisionBasis always allocationAmount 40000
+graph indexer rules set QmPy774Z6xNnELMwcie5stweyWdVhj3PMRWxwV9Xm8VpUr decisionBasis always allocationAmount 40000
+graph indexer rules set QmPeDVt7ygNQfmQoxsVazBHosebMeDW62tpyP8gqbZDvbJ decisionBasis always allocationAmount 40000
 ```
 このコマンドを実行すると、オペレーターウォレットからTXが発信し、アロケーションが実施されます。この後、grafanaのダッシュボードで確認すると、インデックスが開始しているはずです。
 
@@ -245,6 +248,13 @@ provider = [ { label = "polygon-xxx", url = "https://xxx.io/", features = [] },
 shard = "primary"
 provider = [ { label = "gnosis-xxx", url = "https://xxx.io/", features = [] },
              { label = "gnosis-yyy", url = "https://yyy.io/", features = ["archive", "traces"] }
+]
+
+# もし、arbitrumでのインデックスをしない場合、[chains.arbitrum-one]のセクションはまるごと削除してください。
+[chains.arbitrum-one]
+shard = "primary"
+provider = [ { label = "arbitrum-one-xxx", url = "https://xxx.io/", features = [] },
+             { label = "arbitrum-one-yyy", url = "https://yyy.io/", features = ["archive", "traces"] }
 ]
 
 # もし、Ethereumでのインデックスをしない場合、[chains.mainnet]のセクションはまるごと削除してください。
