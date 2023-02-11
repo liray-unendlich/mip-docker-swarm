@@ -89,7 +89,7 @@ services:
   #               indexer-console - WebUI for indexer-cli                    #
   ############################################################################
   indexer-cli:
-    image: ghcr.io/graphprotocol/indexer-cli:${INDEXER_VERSION:-v0.20.11}
+    image: ghcr.io/graphprotocol/indexer-cli:${INDEXER_VERSION:-v0.20.5-alpha.1}
     user: $USER_ID:$GROUP_ID
     tty: true
     networks:
