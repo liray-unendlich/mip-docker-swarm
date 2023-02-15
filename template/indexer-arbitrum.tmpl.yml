@@ -1,0 +1,116 @@
+version: "3.5"
+services:
+  ############################################################################
+  #                         Indexer Agent/Service                            #
+  ############################################################################
+
+  indexer-agent:
+    image: ghcr.io/graphprotocol/indexer-agent:${INDEXER_VERSION:-v0.20.11}
+    environment:
+      INDEXER_AGENT_ETHEREUM: https://goerli-rollup.arbitrum.io/rpc
+      INDEXER_AGENT_ETHEREUM_NETWORK: arbitrum-goerli
+      INDEXER_AGENT_INDEXER_ADDRESS: ${INDEXER_ADDRESS}
+      INDEXER_AGENT_MNEMONIC: ${INDEXER_MNEMONIC}
+      INDEXER_AGENT_GEO_COORDINATES: ${INDEXER_GEO}
+      INDEXER_AGENT_NETWORK_SUBGRAPH_ENDPOINT: https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum-goerli
+      INDEXER_AGENT_COLLECT_RECEIPTS_ENDPOINT: https://gateway-testnet-arbitrum.network.thegraph.com/collect-receipts
+      INDEXER_AGENT_EPOCH_SUBGRAPH_ENDPOINT: https://api.thegraph.com/subgraphs/name/juanmardefago/arb-goerli-epoch-block-oracle
+      INDEXER_AGENT_GRAPH_NODE_QUERY_ENDPOINT: ${INDEXER_QUERY_ENDPOINT:-http://query-node:8000}
+      INDEXER_AGENT_GRAPH_NODE_ADMIN_ENDPOINT: ${INDEXER_ADMIN_ENDPOINT:-http://index-node-0:8020}
+      INDEXER_AGENT_GRAPH_NODE_STATUS_ENDPOINT: ${INDEXER_NODE_STATUS_ENDPOINT:-http://index-node-0:8030/graphql}
+      INDEXER_AGENT_PUBLIC_INDEXER_URL: https://indexer-arb.${ROOT_DOMAIN}
+      INDEXER_AGENT_INDEX_NODE_IDS: index_node_0,index_node_1
+      INDEXER_AGENT_INDEXER_MANAGEMENT_PORT: 8000
+      INDEXER_AGENT_POSTGRES_HOST: "postgres"
+      INDEXER_AGENT_POSTGRES_DATABASE: "indexer-arb"
+      INDEXER_AGENT_POSTGRES_USERNAME: "${DB_USER}"
+      INDEXER_AGENT_POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      INDEXER_AGENT_REBATE_CLAIM_BATCH_THRESHOLD: "0"
+      INDEXER_AGENT_REBATE_CLAIM_THRESHOLD: "0"
+      INDEXER_AGENT_VOUCHER_REDEMPTION_BATCH_THRESHOLD: "0"
+      INDEXER_AGENT_VOUCHER_REDEMPTION_THRESHOLD: "0"
+      TZ: Asia/Tokyo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    networks:
+      - indexer_default
+      - monitor
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == indexer-manager
+
+  indexer-service:
+    image: ghcr.io/graphprotocol/indexer-service:${INDEXER_VERSION:-v0.20.11}
+    environment:
+      INDEXER_SERVICE_ETHEREUM: https://goerli-rollup.arbitrum.io/rpc
+      INDEXER_SERVICE_ETHEREUM_NETWORK: arbitrum-goerli
+      INDEXER_SERVICE_INDEXER_ADDRESS: ${INDEXER_ADDRESS}
+      INDEXER_SERVICE_MNEMONIC: ${INDEXER_MNEMONIC}
+      INDEXER_SERVICE_NETWORK_SUBGRAPH_ENDPOINT: https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum-goerli
+      INDEXER_SERVICE_CLIENT_SIGNER_ADDRESS: "0xe1EC4339019eC9628438F8755f847e3023e4ff9c"
+      INDEXER_SERVICE_GRAPH_NODE_QUERY_ENDPOINT: ${INDEXER_QUERY_ENDPOINT:-http://query-node:8000}
+      INDEXER_SERVICE_GRAPH_NODE_ADMIN_ENDPOINT: ${INDEXER_ADMIN_ENDPOINT:-http://index-node-0:8020}
+      INDEXER_SERVICE_GRAPH_NODE_STATUS_ENDPOINT: ${INDEXER_NODE_STATUS_ENDPOINT:-http://index-node-0:8030/graphql}
+      INDEXER_SERVICE_SERVER_PORT: 5432
+      INDEXER_SERVICE_POSTGRES_HOST: "postgres"
+      INDEXER_SERVICE_POSTGRES_DATABASE: "indexer-arb"
+      INDEXER_SERVICE_POSTGRES_USERNAME: "${DB_USER}"
+      INDEXER_SERVICE_POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      TZ: Asia/Tokyo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    # Swarm
+    networks:
+      - indexer_default
+      - traefik-public
+      - monitor
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - "traefik.http.routers.indexer-service.rule=Host(`indexer-arb.${ROOT_DOMAIN}`)"
+        - traefik.http.routers.indexer-service.entrypoints=https
+        - traefik.http.routers.indexer-service.tls=true
+        - traefik.http.routers.indexer-service.tls.certresolver=le
+        - traefik.http.services.indexer-service.loadbalancer.server.port=7600
+
+  ############################################################################
+  #               indexer-console - WebUI for indexer-cli                    #
+  ############################################################################
+  indexer-cli:
+    image: ghcr.io/graphprotocol/indexer-cli:${INDEXER_VERSION:-v0.20.5-alpha.1}
+    user: $USER_ID:$GROUP_ID
+    tty: true
+    networks:
+      - indexer_default
+    volumes:
+      - ../deployment/default.agora:/home/graph/default.agora:ro
+    logging:
+      driver: json-file
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  indexer_default:
+    external: true
+  monitor:
+    external: true
+  traefik-public:
+    external: true
