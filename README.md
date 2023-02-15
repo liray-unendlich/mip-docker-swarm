@@ -30,6 +30,7 @@ MIP テストネットへの対応として、サーバーに以下の構造の�
 | prometheus | prometheus.sld.tld | サーバー（マネージャー）の IP |
 | grafana | grafana.sld.tld | サーバー（マネージャー）の IP |
 | indexer | indexer.sld.tld | サーバー（マネージャー）の IP |
+| indexer-arbitrum | indexer-arb.sld.tld | サーバー（マネージャー）の IP |
 
 目次は以下のとおりです。
 - [mip-docker-swarm](#mip-docker-swarm)
@@ -120,7 +121,7 @@ nano graph-node-config/config.toml
 
 このファイルは、インデックスノード及びクエリノードが、様々なチェーンで適切にデータを取得するための設定ファイルになっています。すなわち、どんなチェーンを、どのようなエンドポイントの組からデータ取得するかを定義しています。[graph-nodeのconfigについて](#graph-nodeのconfigについて) から、設定方法をご覧ください。
 
-※現在は、*Arbitrum-one* でのインデックステストを行っています。下のサブグラフ一覧から、必要なサブグラフに割当を行いましょう。
+※今どのチェーンのテストネットを行っているかは、[Notion](https://thegraphfoundation.notion.site/MIPs-Home-911e1187f1d94d12b247317265f81059)からご覧ください（更新多くて追いきれないので）。下のサブグラフ一覧から、必要なサブグラフに割当を行いましょう。
 
 さて、config.tomlが適切に設定出来たら、サーバー上で、次のコマンドを一行ずつ実施します。
 ```
@@ -159,7 +160,6 @@ https://testnet.thegraph.com でインデクサーになるため、200kGRT を�
 portainerより、stack > indexer > indexer-cli と移動し、コンソールを開きましょう。
 次のコマンドを一行ずつ入力し、アロケーションを行いましょう。
 
-_※1/18現在、1つのサブグラフが破損しているので、下のコマンドリストには含めてません。_
 また、40000は割り当てたい枚数に適宜変更してください（枚数の大小は報酬に影響しません）。
 ```
 graph indexer rules set QmdPYiwtdBqeDKeMHKWDhuJFxu1TAxWP3qo2Peptia4sLB decisionBasis always allocationAmount 40000
